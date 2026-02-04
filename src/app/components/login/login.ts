@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -12,7 +12,7 @@ import { SupabaseService } from '../../services/supabase.service';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     FormsModule,
@@ -25,7 +25,7 @@ import { SupabaseService } from '../../services/supabase.service';
     MatIconModule
   ],
   templateUrl: './login.html',
-  styleUrls: ['./login.scss']
+  styleUrl: './login.scss'
 })
 export class LoginComponent {
   private supabase = inject(SupabaseService);
@@ -37,7 +37,7 @@ export class LoginComponent {
   error = signal<string | null>(null);
   hidePassword = signal(true);
 
-  async onSubmit() {
+  async onSubmit(): Promise<void> {
     if (!this.email() || !this.password()) {
       this.error.set('Por favor completa todos los campos');
       return;
@@ -57,7 +57,7 @@ export class LoginComponent {
     }
   }
 
-  togglePasswordVisibility() {
+  togglePasswordVisibility(): void {
     this.hidePassword.set(!this.hidePassword());
   }
 }

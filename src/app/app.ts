@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -11,6 +11,7 @@ import { SupabaseService } from './services/supabase.service';
 
 @Component({
   selector: 'app-root',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterOutlet,
@@ -33,7 +34,7 @@ export class App {
   cartItemCount = this.cartService.itemCount;
   currentUser = this.supabase.currentUser$;
 
-  async logout() {
+  async logout(): Promise<void> {
     try {
       await this.supabase.signOut();
       this.router.navigate(['/login']);

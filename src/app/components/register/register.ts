@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -12,7 +12,7 @@ import { SupabaseService } from '../../services/supabase.service';
 
 @Component({
   selector: 'app-register',
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     FormsModule,
@@ -25,7 +25,7 @@ import { SupabaseService } from '../../services/supabase.service';
     MatIconModule
   ],
   templateUrl: './register.html',
-  styleUrls: ['./register.scss']
+  styleUrl: './register.scss'
 })
 export class RegisterComponent {
   private supabase = inject(SupabaseService);
@@ -40,7 +40,7 @@ export class RegisterComponent {
   hidePassword = signal(true);
   hideConfirmPassword = signal(true);
 
-  async onSubmit() {
+  async onSubmit(): Promise<void> {
     // Validations
     if (!this.email() || !this.password() || !this.confirmPassword()) {
       this.error.set('Por favor completa todos los campos');
@@ -83,11 +83,11 @@ export class RegisterComponent {
     }
   }
 
-  togglePasswordVisibility() {
+  togglePasswordVisibility(): void {
     this.hidePassword.set(!this.hidePassword());
   }
 
-  toggleConfirmPasswordVisibility() {
+  toggleConfirmPasswordVisibility(): void {
     this.hideConfirmPassword.set(!this.hideConfirmPassword());
   }
 }

@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { Observable } from 'rxjs';
 
 export interface AuthUser {
   id: string;
@@ -13,8 +14,18 @@ export interface AuthUser {
 })
 export class SupabaseService {
   private supabase: SupabaseClient;
-  private currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
-  public currentUser$: Observable<AuthUser | null> = this.currentUserSubject.asObservable();
+  
+  // Private writable signal
+  private _currentUser = signal<AuthUser | null>(null);
+  
+  // Public readonly signal
+  readonly currentUser = this._currentUser.asReadonly();
+  
+  // Observable for backwards compatibility
+  readonly currentUser$: Observable<AuthUser | null> = toObservable(this._currentUser);
+  
+  // Computed
+  readonly isAuthenticated = computed(() => this._currentUser() !== null);
 
   constructor() {
     this.supabase = createClient(
@@ -25,16 +36,16 @@ export class SupabaseService {
     // Check for existing session
     this.supabase.auth.getSession().then(({ data }) => {
       if (data.session?.user) {
-        this.currentUserSubject.next(this.mapUser(data.session.user));
+        this._currentUser.set(this.mapUser(data.session.user));
       }
     });
 
     // Listen for auth changes
     this.supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
-        this.currentUserSubject.next(this.mapUser(session.user));
+        this._currentUser.set(this.mapUser(session.user));
       } else {
-        this.currentUserSubject.next(null);
+        this._currentUser.set(null);
       }
     });
   }
@@ -51,10 +62,10 @@ export class SupabaseService {
   }
 
   getCurrentUser(): AuthUser | null {
-    return this.currentUserSubject.value;
+    return this._currentUser();
   }
 
-  async signUp(email: string, password: string) {
+  async signUp(email: string, password: string): Promise<unknown> {
     const { data, error } = await this.supabase.auth.signUp({
       email,
       password
@@ -64,7 +75,7 @@ export class SupabaseService {
     return data;
   }
 
-  async signIn(email: string, password: string) {
+  async signIn(email: string, password: string): Promise<unknown> {
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email,
       password
@@ -74,20 +85,16 @@ export class SupabaseService {
     return data;
   }
 
-  async signOut() {
+  async signOut(): Promise<void> {
     const { error } = await this.supabase.auth.signOut();
     if (error) throw error;
   }
 
-  async resetPassword(email: string) {
+  async resetPassword(email: string): Promise<void> {
     const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`
     });
 
     if (error) throw error;
-  }
-
-  isAuthenticated(): boolean {
-    return this.currentUserSubject.value !== null;
   }
 }
