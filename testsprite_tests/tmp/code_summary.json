@@ -1,0 +1,85 @@
+{
+  "tech_stack": [
+    "TypeScript",
+    "Angular 20.3",
+    "Angular Material",
+    "RxJS",
+    "SCSS",
+    "Jasmine",
+    "Karma"
+  ],
+  "features": [
+    {
+      "name": "App Component",
+      "description": "Root component with navigation toolbar and cart badge showing item count",
+      "files": [
+        "src/app/app.ts",
+        "src/app/app.html",
+        "src/app/app.scss",
+        "src/app/app.spec.ts"
+      ]
+    },
+    {
+      "name": "Product List Component",
+      "description": "Displays a grid of products with ability to add items to cart",
+      "files": [
+        "src/app/components/product-list/product-list.ts",
+        "src/app/components/product-list/product-list.html",
+        "src/app/components/product-list/product-list.scss",
+        "src/app/components/product-list/product-list.spec.ts"
+      ]
+    },
+    {
+      "name": "Cart Component",
+      "description": "Shopping cart view showing added items, quantities, total price, and checkout functionality",
+      "files": [
+        "src/app/components/cart/cart.ts",
+        "src/app/components/cart/cart.html",
+        "src/app/components/cart/cart.scss",
+        "src/app/components/cart/cart.spec.ts"
+      ]
+    },
+    {
+      "name": "Cart Service",
+      "description": "Manages shopping cart state using Angular signals - add/remove items, update quantities, calculate totals",
+      "files": [
+        "src/app/services/cart.service.ts"
+      ]
+    },
+    {
+      "name": "Product Service",
+      "description": "Provides product catalog data with 6 sample products across different categories",
+      "files": [
+        "src/app/services/product.service.ts"
+      ]
+    },
+    {
+      "name": "Product Model",
+      "description": "TypeScript interface defining product structure with id, name, description, price, image, and category",
+      "files": [
+        "src/app/models/product.model.ts"
+      ]
+    },
+    {
+      "name": "Cart Item Model",
+      "description": "TypeScript interface defining cart item structure with product and quantity",
+      "files": [
+        "src/app/models/cart-item.model.ts"
+      ]
+    },
+    {
+      "name": "Routing Configuration",
+      "description": "Angular routing setup with routes for product list and cart views",
+      "files": [
+        "src/app/app.routes.ts"
+      ]
+    },
+    {
+      "name": "App Configuration",
+      "description": "Angular application configuration with routing and animations setup",
+      "files": [
+        "src/app/app.config.ts"
+      ]
+    }
+  ]
+}

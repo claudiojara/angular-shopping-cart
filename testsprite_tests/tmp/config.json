@@ -1,0 +1,17 @@
+{
+  "status": "init",
+  "scope": "codebase",
+  "type": "frontend",
+  "localEndpoint": "http://localhost:4200/",
+  "serverPort": 54303,
+  "executionArgs": {
+    "projectName": "shopping-cart",
+    "projectPath": "/Users/claudiojara/dev/agents/skills/angular/shopping-cart",
+    "testIds": [],
+    "additionalInstruction": "",
+    "envs": {
+      "API_KEY": "sk-user-ZHrENprBhz74kCEJlxkXDFLjRHn3UgLmXsEsPauOyaV7c3kMBvrP7elEBn9NUvFR8lsJNgnOwJyPCftKp4ydWWvz-dDAejmDEJ_yeHQoHSO53PULRqgt5Iq41lZNxrdpLAo"
+    }
+  },
+  "proxy": "http://6911be0d-a498-4c1e-82aa-01c9818b2053:JiXfzWOvhdtVVP3XHjsb62EzdqfID80F@tun.testsprite.com:8080"
+}

@@ -1,0 +1,15 @@
+npm warn exec The following package was not found and will be installed: @testsprite/testsprite-mcp@0.0.21
+🚀 Starting test execution...
+Proxy port: 54305
+Tunnel started successfully! Proxy URL: http://6911be0d-a498-4c1e-82aa-01c9818b2053:JiXfzWOvhdtVVP3XHjsb62EzdqfID80F@tun.testsprite.com:8080
+⚡ Running tests...
+This process may take anywhere from several minutes up to 15 minutes to complete.
+
+✅ Please ensure:
+  • Your local servers are running and reachable
+  • Your internet connection remains stable throughout the process
+Test execution completed.
+HTTP Proxy has been closed.
+Tunnel has been closed.
+
+Server will remain active for 1 hour. Press Ctrl+C to exit early.

@@ -1,0 +1,27 @@
+<mat-toolbar color="primary" class="app-toolbar">
+  <mat-toolbar-row>
+    <button mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <mat-icon>store</mat-icon>
+      <span>TiendApp</span>
+    </button>
+
+    <span class="spacer"></span>
+
+    <button mat-button routerLink="/products" routerLinkActive="active">
+      <mat-icon>inventory_2</mat-icon>
+      <span>Productos</span>
+    </button>
+
+    <button mat-button routerLink="/cart" routerLinkActive="active">
+      <mat-icon [matBadge]="cartItemCount()" [matBadgeHidden]="cartItemCount() === 0" matBadgeColor="accent">
+        shopping_cart
+      </mat-icon>
+      <span>Carrito</span>
+    </button>
+  </mat-toolbar-row>
+</mat-toolbar>
+
+<main class="app-content">
+  <router-outlet />
+</main>
+
