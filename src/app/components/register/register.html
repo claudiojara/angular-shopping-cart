@@ -1,0 +1,104 @@
+<div class="register-container">
+  <mat-card class="register-card">
+    <mat-card-header>
+      <mat-card-title>Crear Cuenta</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Correo Electrónico</mat-label>
+          <input 
+            matInput 
+            type="email" 
+            [ngModel]="email()"
+            (ngModelChange)="email.set($event)"
+            name="email"
+            required
+            email
+            [disabled]="loading()"
+            autocomplete="email">
+          <mat-icon matPrefix>email</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input 
+            matInput 
+            [type]="hidePassword() ? 'password' : 'text'"
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            name="password"
+            required
+            minlength="6"
+            [disabled]="loading()"
+            autocomplete="new-password">
+          <mat-icon matPrefix>lock</mat-icon>
+          <button 
+            mat-icon-button 
+            matSuffix 
+            type="button"
+            (click)="togglePasswordVisibility()"
+            [disabled]="loading()">
+            <mat-icon>{{hidePassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-hint>Mínimo 6 caracteres</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Confirmar Contraseña</mat-label>
+          <input 
+            matInput 
+            [type]="hideConfirmPassword() ? 'password' : 'text'"
+            [ngModel]="confirmPassword()"
+            (ngModelChange)="confirmPassword.set($event)"
+            name="confirmPassword"
+            required
+            [disabled]="loading()"
+            autocomplete="new-password">
+          <mat-icon matPrefix>lock</mat-icon>
+          <button 
+            mat-icon-button 
+            matSuffix 
+            type="button"
+            (click)="toggleConfirmPasswordVisibility()"
+            [disabled]="loading()">
+            <mat-icon>{{hideConfirmPassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        @if (error()) {
+          <div class="error-message">
+            <mat-icon>error</mat-icon>
+            <span>{{ error() }}</span>
+          </div>
+        }
+
+        @if (success()) {
+          <div class="success-message">
+            <mat-icon>check_circle</mat-icon>
+            <span>{{ success() }}</span>
+          </div>
+        }
+
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit"
+          class="full-width submit-button"
+          [disabled]="loading() || !registerForm.form.valid">
+          @if (loading()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            Registrarse
+          }
+        </button>
+
+        <div class="login-link">
+          <span>¿Ya tienes cuenta?</span>
+          <a routerLink="/login" mat-button color="primary">Inicia Sesión</a>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

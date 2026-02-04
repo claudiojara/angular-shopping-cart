@@ -1,0 +1,72 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <mat-card-title>Iniciar Sesión</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Correo Electrónico</mat-label>
+          <input 
+            matInput 
+            type="email" 
+            [ngModel]="email()"
+            (ngModelChange)="email.set($event)"
+            name="email"
+            required
+            [disabled]="loading()"
+            autocomplete="email">
+          <mat-icon matPrefix>email</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input 
+            matInput 
+            [type]="hidePassword() ? 'password' : 'text'"
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            name="password"
+            required
+            [disabled]="loading()"
+            autocomplete="current-password">
+          <mat-icon matPrefix>lock</mat-icon>
+          <button 
+            mat-icon-button 
+            matSuffix 
+            type="button"
+            (click)="togglePasswordVisibility()"
+            [disabled]="loading()">
+            <mat-icon>{{hidePassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        @if (error()) {
+          <div class="error-message">
+            <mat-icon>error</mat-icon>
+            <span>{{ error() }}</span>
+          </div>
+        }
+
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit"
+          class="full-width submit-button"
+          [disabled]="loading() || !loginForm.form.valid">
+          @if (loading()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            Iniciar Sesión
+          }
+        </button>
+
+        <div class="register-link">
+          <span>¿No tienes cuenta?</span>
+          <a routerLink="/register" mat-button color="primary">Regístrate</a>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,15 +1,31 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { CartItem } from '../models/cart-item.model';
 import { Product } from '../models/product.model';
+import { SupabaseService } from './supabase.service';
+import { ProductService } from './product.service';
+
+interface DbCartItem {
+  id: number;
+  user_id: string;
+  product_id: number;
+  quantity: number;
+  created_at: string;
+  updated_at: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
+  private supabase = inject(SupabaseService);
+  private productService = inject(ProductService);
+  
   private cartItems = signal<CartItem[]>([]);
+  private isLoading = signal<boolean>(false);
 
   // Computed signals para estado derivado
   items = this.cartItems.asReadonly();
+  loading = this.isLoading.asReadonly();
   
   itemCount = computed(() => 
     this.cartItems().reduce((total, item) => total + item.quantity, 0)
@@ -19,35 +35,124 @@ export class CartService {
     this.cartItems().reduce((sum, item) => sum + (item.product.price * item.quantity), 0)
   );
 
-  addToCart(product: Product): void {
+  constructor() {
+    // Subscribe to auth changes and load cart
+    this.supabase.currentUser$.subscribe(user => {
+      if (user) {
+        this.loadCartFromDb();
+      } else {
+        this.cartItems.set([]);
+      }
+    });
+  }
+
+  private async loadCartFromDb(): Promise<void> {
+    if (!this.supabase.isAuthenticated()) return;
+
+    this.isLoading.set(true);
+    try {
+      const { data, error } = await this.supabase.client
+        .from('cart_items')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      if (data) {
+        const cartItems: CartItem[] = (data as DbCartItem[])
+          .map(dbItem => {
+            const product = this.productService.getProductById(dbItem.product_id);
+            if (product) {
+              return {
+                product,
+                quantity: dbItem.quantity
+              };
+            }
+            return null;
+          })
+          .filter((item): item is CartItem => item !== null);
+
+        this.cartItems.set(cartItems);
+      }
+    } catch (error) {
+      console.error('Error loading cart:', error);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  async addToCart(product: Product): Promise<void> {
     const currentItems = this.cartItems();
     const existingItem = currentItems.find(item => item.product.id === product.id);
 
     if (existingItem) {
-      this.cartItems.update(items => 
-        items.map(item => 
-          item.product.id === product.id 
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        )
-      );
+      await this.updateQuantity(product.id, existingItem.quantity + 1);
     } else {
+      // Optimistic update
       this.cartItems.update(items => [...items, { product, quantity: 1 }]);
+
+      // Sync to DB if authenticated
+      if (this.supabase.isAuthenticated()) {
+        try {
+          const user = this.supabase.getCurrentUser();
+          const { error } = await this.supabase.client
+            .from('cart_items')
+            .insert({
+              user_id: user!.id,
+              product_id: product.id,
+              quantity: 1
+            });
+
+          if (error) {
+            // Rollback on error
+            this.cartItems.update(items => 
+              items.filter(item => item.product.id !== product.id)
+            );
+            throw error;
+          }
+        } catch (error) {
+          console.error('Error adding to cart:', error);
+        }
+      }
     }
   }
 
-  removeFromCart(productId: number): void {
+  async removeFromCart(productId: number): Promise<void> {
+    // Optimistic update
+    const removedItem = this.cartItems().find(item => item.product.id === productId);
     this.cartItems.update(items => 
       items.filter(item => item.product.id !== productId)
     );
+
+    // Sync to DB if authenticated
+    if (this.supabase.isAuthenticated()) {
+      try {
+        const { error } = await this.supabase.client
+          .from('cart_items')
+          .delete()
+          .eq('product_id', productId);
+
+        if (error) {
+          // Rollback on error
+          if (removedItem) {
+            this.cartItems.update(items => [...items, removedItem]);
+          }
+          throw error;
+        }
+      } catch (error) {
+        console.error('Error removing from cart:', error);
+      }
+    }
   }
 
-  updateQuantity(productId: number, quantity: number): void {
+  async updateQuantity(productId: number, quantity: number): Promise<void> {
     if (quantity <= 0) {
-      this.removeFromCart(productId);
+      await this.removeFromCart(productId);
       return;
     }
 
+    // Optimistic update
+    const oldQuantity = this.cartItems().find(item => item.product.id === productId)?.quantity;
     this.cartItems.update(items =>
       items.map(item =>
         item.product.id === productId
@@ -55,9 +160,56 @@ export class CartService {
           : item
       )
     );
+
+    // Sync to DB if authenticated
+    if (this.supabase.isAuthenticated()) {
+      try {
+        const { error } = await this.supabase.client
+          .from('cart_items')
+          .update({ quantity })
+          .eq('product_id', productId);
+
+        if (error) {
+          // Rollback on error
+          if (oldQuantity !== undefined) {
+            this.cartItems.update(items =>
+              items.map(item =>
+                item.product.id === productId
+                  ? { ...item, quantity: oldQuantity }
+                  : item
+              )
+            );
+          }
+          throw error;
+        }
+      } catch (error) {
+        console.error('Error updating quantity:', error);
+      }
+    }
   }
 
-  clearCart(): void {
+  async clearCart(): Promise<void> {
+    // Optimistic update
+    const backup = [...this.cartItems()];
     this.cartItems.set([]);
+
+    // Sync to DB if authenticated
+    if (this.supabase.isAuthenticated()) {
+      try {
+        const user = this.supabase.getCurrentUser();
+        const { error } = await this.supabase.client
+          .from('cart_items')
+          .delete()
+          .eq('user_id', user!.id);
+
+        if (error) {
+          // Rollback on error
+          this.cartItems.set(backup);
+          throw error;
+        }
+      } catch (error) {
+        console.error('Error clearing cart:', error);
+      }
+    }
   }
 }
