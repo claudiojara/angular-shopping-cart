@@ -24,11 +24,44 @@ ng build --configuration development         # Dev build with sourcemaps
 ```
 
 ### Testing
+
+#### Unit Tests (Jasmine/Karma)
 ```bash
-npm test                                     # All tests
+npm test                                     # All unit tests
 ng test --include='**/cart.service.spec.ts' # Single test file
 ng test --browsers=ChromeHeadless            # Headless (CI)
 ```
+
+#### E2E Tests (Playwright)
+```bash
+npm run test:e2e                             # Run E2E tests (headless)
+npm run test:e2e:ui                          # Interactive UI mode
+npm run test:e2e:headed                      # Watch tests run in browser
+npm run test:e2e:report                      # View test results
+```
+
+**Pre-requisitos para E2E:**
+
+Antes de ejecutar tests E2E, crear usuario de testing en Supabase:
+
+1. **Crear usuario estático:**
+   - Email: `playwright-test@example.com`
+   - Password: `PlaywrightTest123!`
+   - Método: Dashboard → Authentication → Users → Add User
+
+2. **Deshabilitar confirmación de email (solo testing):**
+   - Ruta: Dashboard → Authentication → Email Auth
+   - Acción: Disable "Enable email confirmations"
+
+3. **Verificar RLS policies:**
+   - Asegurar que el usuario puede leer/escribir en tablas necesarias
+   - Usuario debe poder acceder a productos y carrito
+
+**Estructura de tests:**
+- `e2e/authentication.spec.ts` - TC001-TC005 (Login/Register/Logout)
+- `e2e/shopping-cart.spec.ts` - TC006-TC015 (Productos/Carrito/Navegación)
+- `e2e/pages/*.page.ts` - Page Object Models con selectores `data-testid`
+- `e2e/config/test-credentials.ts` - Credenciales centralizadas
 
 ## File Naming
 

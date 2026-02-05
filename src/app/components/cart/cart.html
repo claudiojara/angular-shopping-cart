@@ -2,11 +2,11 @@
   <mat-card class="cart-card">
     <mat-card-header>
       <mat-card-title>
-        <div class="cart-title">
+        <div class="cart-title" data-testid="cart-title">
           <mat-icon>shopping_cart</mat-icon>
           <span>Carrito de Compras</span>
           @if (itemCount() > 0) {
-            <span class="item-count" [matBadge]="itemCount()" matBadgeColor="accent"></span>
+            <span class="item-count" [matBadge]="itemCount()" matBadgeColor="accent" data-testid="cart-item-count"></span>
           }
         </div>
       </mat-card-title>
@@ -14,21 +14,21 @@
 
     <mat-card-content>
       @if (items().length === 0) {
-        <div class="empty-cart">
+        <div class="empty-cart" data-testid="empty-cart-message">
           <mat-icon class="empty-icon">shopping_cart</mat-icon>
           <h2>Tu carrito está vacío</h2>
           <p>Agrega productos para comenzar tu compra</p>
         </div>
       } @else {
-        <mat-list class="cart-items">
+        <mat-list class="cart-items" data-testid="cart-items-list">
           @for (item of items(); track item.product.id) {
-            <mat-list-item class="cart-item">
+            <mat-list-item class="cart-item" [attr.data-testid]="'cart-item-' + item.product.id">
               <div class="item-content">
-                <img [src]="item.product.image" [alt]="item.product.name" class="item-image" />
+                <img [src]="item.product.image" [alt]="item.product.name" class="item-image" [attr.data-testid]="'cart-item-image-' + item.product.id" />
                 
                 <div class="item-details">
-                  <h3 class="item-name">{{ item.product.name }}</h3>
-                  <p class="item-price">{{ item.product.price | currency }}</p>
+                  <h3 class="item-name" [attr.data-testid]="'cart-item-name-' + item.product.id">{{ item.product.name }}</h3>
+                  <p class="item-price" [attr.data-testid]="'cart-item-price-' + item.product.id">{{ item.product.price | currency }}</p>
                   
                   <div class="quantity-controls">
                     <button 
@@ -59,7 +59,7 @@
                 </div>
 
                 <div class="item-actions">
-                  <p class="item-subtotal">{{ item.product.price * item.quantity | currency }}</p>
+                  <p class="item-subtotal" [attr.data-testid]="'cart-item-subtotal-' + item.product.id">{{ item.product.price * item.quantity | currency }}</p>
                   <button 
                     mat-mini-fab 
                     color="warn" 
@@ -77,10 +77,10 @@
           }
         </mat-list>
 
-        <div class="cart-summary">
+        <div class="cart-summary" data-testid="cart-summary">
           <div class="total-section">
             <h2>Total</h2>
-            <h2 class="total-amount">{{ total() | currency }}</h2>
+            <h2 class="total-amount" data-testid="cart-total-amount">{{ total() | currency }}</h2>
           </div>
 
           <div class="action-buttons">

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "TC001",
+    "title": "register a new user with valid data",
+    "description": "Test the /auth/signup endpoint to ensure a new user can register successfully with valid email and password inputs."
+  },
+  {
+    "id": "TC002",
+    "title": "sign in user with correct credentials",
+    "description": "Verify the /auth/signin endpoint allows a user to sign in successfully when provided with valid email and password."
+  },
+  {
+    "id": "TC003",
+    "title": "sign out user successfully",
+    "description": "Check the /auth/signout endpoint to confirm that a signed-in user can log out successfully."
+  },
+  {
+    "id": "TC004",
+    "title": "get all products list",
+    "description": "Test the /products GET endpoint to retrieve the full list of 6 preloaded products with correct details and images."
+  },
+  {
+    "id": "TC005",
+    "title": "get product details by id",
+    "description": "Verify the /products/{id} GET endpoint returns the correct product details for a valid product ID and returns 404 for invalid IDs."
+  },
+  {
+    "id": "TC006",
+    "title": "get cart items for current user",
+    "description": "Test the /cart/items GET endpoint to fetch the current user's cart items with accurate quantity and product information."
+  },
+  {
+    "id": "TC007",
+    "title": "add item to cart with valid input",
+    "description": "Verify the /cart/items POST endpoint adds a product to the cart successfully when provided with valid product_id and quantity."
+  },
+  {
+    "id": "TC008",
+    "title": "update cart item quantity",
+    "description": "Test the /cart/items/{product_id} PATCH endpoint to update the quantity of a specific cart item and handle item not found errors."
+  },
+  {
+    "id": "TC009",
+    "title": "remove item from cart",
+    "description": "Check the /cart/items/{product_id} DELETE endpoint to remove a specific item from the cart and handle cases where the item does not exist."
+  },
+  {
+    "id": "TC010",
+    "title": "clear all cart items",
+    "description": "Verify the /cart/items DELETE endpoint clears all items from the current user's cart successfully."
+  }
+]

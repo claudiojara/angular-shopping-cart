@@ -1,188 +1,264 @@
 [
   {
     "id": "TC001",
-    "title": "Display Product Catalog with All Products",
-    "description": "Verify the product catalog displays all six sample products with correct images, descriptions, prices, and category chips.",
+    "title": "User Registration Success",
+    "description": "Verify that a new user can register successfully with valid email and password.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to the Product List page."
+        "description": "Navigate to the registration page."
+      },
+      {
+        "type": "action",
+        "description": "Input a valid email address and a password that meets the minimum length (6 characters)."
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form."
       },
       {
         "type": "assertion",
-        "description": "Check that exactly six product cards are displayed."
-      },
-      {
-        "type": "assertion",
-        "description": "Verify each product card shows correct product name, image, description, price, and category chip."
+        "description": "Confirm that registration is successful and user is notified accordingly."
       }
     ]
   },
   {
     "id": "TC002",
-    "title": "Add Single Product to Cart Updates Cart Badge and Cart Contents",
-    "description": "Verify that adding a single product to the cart updates the cart badge count and cart view contents accordingly.",
-    "category": "functional",
+    "title": "User Registration Input Validation",
+    "description": "Verify the registration validation for invalid email and password inputs.",
+    "category": "error handling",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "On the Product List page, click the 'Add to Cart' button for one product."
-      },
-      {
-        "type": "assertion",
-        "description": "Check that the cart badge count increments to 1."
+        "description": "Navigate to the registration page."
       },
       {
         "type": "action",
-        "description": "Navigate to the Cart view."
+        "description": "Input invalid email addresses (e.g., missing '@', missing domain)."
+      },
+      {
+        "type": "action",
+        "description": "Input passwords shorter than 6 characters."
+      },
+      {
+        "type": "action",
+        "description": "Attempt to submit the registration form."
       },
       {
         "type": "assertion",
-        "description": "Verify the cart contains the added product with quantity 1 and correct product details."
+        "description": "Validation errors are displayed for the email and password inputs, and registration is not submitted."
       }
     ]
   },
   {
     "id": "TC003",
-    "title": "Add Multiple Different Products to Cart and Verify Totals",
-    "description": "Add multiple different products with one quantity each and verify cart item count and total price updates correctly.",
+    "title": "User Login Success",
+    "description": "Verify that an existing user can log in successfully with correct credentials.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "On the Product List page, add three different products to the cart."
-      },
-      {
-        "type": "assertion",
-        "description": "Validate that the cart badge count shows 3."
+        "description": "Navigate to the login page."
       },
       {
         "type": "action",
-        "description": "Open the Cart view."
+        "description": "Input valid existing user email and correct password."
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form."
       },
       {
         "type": "assertion",
-        "description": "Confirm the cart lists all three products, each with quantity 1."
-      },
-      {
-        "type": "assertion",
-        "description": "Calculate and verify the total price shown matches the sum of the three product prices."
+        "description": "User is logged in successfully and redirected to the product listing or home page."
       }
     ]
   },
   {
     "id": "TC004",
-    "title": "Increase Product Quantity Updates Cart Quantity and Total Price",
-    "description": "Verify incrementing the quantity of a product in the cart updates the count, total price, and cart badge count in real-time.",
-    "category": "functional",
+    "title": "User Login Failure with Invalid Credentials",
+    "description": "Verify that login fails if incorrect email or password is entered.",
+    "category": "error handling",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Add a product to the cart with initial quantity 1."
+        "description": "Navigate to the login page."
       },
       {
         "type": "action",
-        "description": "Navigate to the Cart view."
+        "description": "Input valid email but incorrect password."
       },
       {
         "type": "action",
-        "description": "Click the '+' button to increase the product quantity to 3."
+        "description": "Submit the login form."
       },
       {
         "type": "assertion",
-        "description": "Ensure the product quantity updates to 3."
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the cart badge reflects total quantity 3."
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the total price is correctly updated according to quantity multiplied by product price."
+        "description": "Login fails, error message is shown indicating invalid credentials."
       }
     ]
   },
   {
     "id": "TC005",
-    "title": "Decrease Product Quantity to Zero Removes Product from Cart",
-    "description": "Verify that decreasing a product quantity to zero removes the product from the cart, updates totals, and cart badge accordingly.",
+    "title": "User Logout Success",
+    "description": "Verify that an authenticated user can log out successfully.",
     "category": "functional",
-    "priority": "High",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Add a product to cart with quantity 2."
+        "description": "Log in with valid credentials."
       },
       {
         "type": "action",
-        "description": "Go to Cart view."
-      },
-      {
-        "type": "action",
-        "description": "Click the '-' button twice to reduce quantity to zero."
+        "description": "Use the user menu to initiate logout."
       },
       {
         "type": "assertion",
-        "description": "Verify the product is removed from the cart list."
-      },
-      {
-        "type": "assertion",
-        "description": "Ensure the cart badge count is updated accordingly (reduced by product quantity)."
-      },
-      {
-        "type": "assertion",
-        "description": "Check that total price decrements and reflects remaining cart items correctly."
+        "description": "User is logged out successfully and redirected to login or home page."
       }
     ]
   },
   {
     "id": "TC006",
-    "title": "Remove Product Directly from Cart Updates Totals and Badge",
-    "description": "Verify removing a product from the cart using removal option updates cart contents, total price, and cart badge correctly.",
+    "title": "Product Catalog Displays All Products",
+    "description": "Verify that the product catalog page displays all 6 pre-loaded products with correct details and images.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Add multiple products to the cart."
-      },
-      {
-        "type": "action",
-        "description": "Navigate to Cart view."
-      },
-      {
-        "type": "action",
-        "description": "Use the remove button to delete one product from the cart."
+        "description": "Navigate to the product listing page."
       },
       {
         "type": "assertion",
-        "description": "Confirm the product is removed from the cart list."
-      },
-      {
-        "type": "assertion",
-        "description": "Validate the cart badge and total price update accordingly."
+        "description": "All 6 products are displayed in a grid with their name, description, price, image, and category."
       }
     ]
   },
   {
     "id": "TC007",
-    "title": "Clear Cart Button Empties Cart and Resets Badge and Totals",
-    "description": "Verify that clicking the 'Clear Cart' button empties all products from cart, resets total price and cart badge count to zero.",
+    "title": "Product Details Retrieval by ID",
+    "description": "Verify that product details can be fetched correctly by product ID from the backend.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Request product details using a valid product ID."
+      },
+      {
+        "type": "assertion",
+        "description": "Product details are returned correctly matching the data in the catalog."
+      },
+      {
+        "type": "action",
+        "description": "Request product details using an invalid product ID."
+      },
+      {
+        "type": "assertion",
+        "description": "System returns a 404 not found error."
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Add Product to Shopping Cart",
+    "description": "Verify that the user can add a product to the shopping cart and the cart updates in real time.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Add multiple products to the cart."
+        "description": "Navigate to the product listing page."
       },
       {
         "type": "action",
-        "description": "Go to Cart view."
+        "description": "Click the 'Add to Cart' button for a product."
+      },
+      {
+        "type": "assertion",
+        "description": "Shopping cart badge on the navigation toolbar increments accordingly."
+      },
+      {
+        "type": "assertion",
+        "description": "Supabase backend reflects the new cart item with correct product ID and quantity."
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Update Cart Item Quantity",
+    "description": "Verify that the user can increment or decrement the quantity of an item in the shopping cart and changes persist.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the shopping cart page."
+      },
+      {
+        "type": "action",
+        "description": "Increment the quantity of a cart item."
+      },
+      {
+        "type": "assertion",
+        "description": "Cart UI updates immediately showing the new quantity and recalculated total price."
+      },
+      {
+        "type": "assertion",
+        "description": "Cart data in Supabase is updated to match the new quantity."
+      },
+      {
+        "type": "action",
+        "description": "Decrement the quantity of the same cart item."
+      },
+      {
+        "type": "assertion",
+        "description": "Cart updates accordingly, and if quantity reaches zero the item is removed."
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Remove Item from Shopping Cart",
+    "description": "Verify that the user can remove an item from the shopping cart and updates are persisted.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the shopping cart page."
+      },
+      {
+        "type": "action",
+        "description": "Click the remove button for a cart item."
+      },
+      {
+        "type": "assertion",
+        "description": "Item is removed immediately from the UI and cart totals are updated."
+      },
+      {
+        "type": "assertion",
+        "description": "Supabase backend no longer contains that cart item."
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Clear Entire Shopping Cart",
+    "description": "Verify that the user can clear all items from the shopping cart at once.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the shopping cart page."
       },
       {
         "type": "action",
@@ -190,242 +266,136 @@
       },
       {
         "type": "assertion",
-        "description": "Verify the cart is empty with no products listed."
+        "description": "All items are removed from the cart UI and the total price resets to zero."
       },
       {
         "type": "assertion",
-        "description": "Check the total price display resets to zero."
-      },
-      {
-        "type": "assertion",
-        "description": "Ensure the cart badge count is cleared to zero."
-      }
-    ]
-  },
-  {
-    "id": "TC008",
-    "title": "Checkout Process Shows Confirmation and Clears Cart",
-    "description": "Verify that performing checkout shows a confirmation message with correct order total and clears the cart afterwards.",
-    "category": "functional",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Add some products to the cart."
-      },
-      {
-        "type": "action",
-        "description": "Open the Cart view."
-      },
-      {
-        "type": "action",
-        "description": "Click the 'Checkout' button."
-      },
-      {
-        "type": "assertion",
-        "description": "Check for a confirmation message that reflects the accurate total purchase amount."
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the cart is cleared after confirmation."
-      },
-      {
-        "type": "assertion",
-        "description": "Confirm the cart badge resets to zero."
-      }
-    ]
-  },
-  {
-    "id": "TC009",
-    "title": "Navigation Toolbar Routes Correctly and Highlights Active Route",
-    "description": "Verify navigation toolbar correctly routes between Product List and Cart views and highlights the active route.",
-    "category": "functional",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "On any page, identify the navigation toolbar."
-      },
-      {
-        "type": "action",
-        "description": "Click the 'Products' link."
-      },
-      {
-        "type": "assertion",
-        "description": "Validate navigation to Product List view."
-      },
-      {
-        "type": "assertion",
-        "description": "Check that the 'Products' navigation item is visually highlighted as active."
-      },
-      {
-        "type": "action",
-        "description": "Click the 'Cart' link in the navigation toolbar."
-      },
-      {
-        "type": "assertion",
-        "description": "Validate navigation to Cart view."
-      },
-      {
-        "type": "assertion",
-        "description": "Check 'Cart' navigation item is visually highlighted as active."
-      }
-    ]
-  },
-  {
-    "id": "TC010",
-    "title": "Cart Badge Displays Real-Time Item Count Updates",
-    "description": "Verify the cart badge on navigation updates in real-time reflecting current item count on adding, removing, and quantity changes.",
-    "category": "functional",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Start with an empty cart."
-      },
-      {
-        "type": "action",
-        "description": "Add one product from the Product List to the cart."
-      },
-      {
-        "type": "assertion",
-        "description": "Validate cart badge shows count 1."
-      },
-      {
-        "type": "action",
-        "description": "Increase quantity of this product to 3 in the Cart view."
-      },
-      {
-        "type": "assertion",
-        "description": "Confirm cart badge updates to 3."
-      },
-      {
-        "type": "action",
-        "description": "Remove the product entirely from the cart."
-      },
-      {
-        "type": "assertion",
-        "description": "Ensure cart badge resets to 0."
-      }
-    ]
-  },
-  {
-    "id": "TC011",
-    "title": "Product List Components Pass UI Rendering Verification",
-    "description": "Verify that the Product List component renders UI elements correctly including the grid layout, product cards, images, and Add to Cart buttons.",
-    "category": "ui",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Render the Product List component."
-      },
-      {
-        "type": "assertion",
-        "description": "Check the product grid layout displays correctly responsive to viewport size."
-      },
-      {
-        "type": "assertion",
-        "description": "Verify each product card shows an image, description, price, category chip, and an enabled 'Add to Cart' button."
+        "description": "Supabase backend reflects the cart cleared state."
       }
     ]
   },
   {
     "id": "TC012",
-    "title": "Cart Component UI Renders Quantity Controls and Totals",
-    "description": "Test that the Cart component renders product details with functional quantity increment/decrement buttons, remove button, total price, and checkout controls.",
-    "category": "ui",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Access the Cart component with existing cart items."
-      },
-      {
-        "type": "assertion",
-        "description": "Validate the presence and state of quantity increment (+) and decrement (-) buttons for each cart item."
-      },
-      {
-        "type": "assertion",
-        "description": "Check the remove button for each cart item is visible and clickable."
-      },
-      {
-        "type": "assertion",
-        "description": "Verify total price and total item count are displayed correctly."
-      },
-      {
-        "type": "assertion",
-        "description": "Ensure the checkout button is enabled when cart is not empty."
-      }
-    ]
-  },
-  {
-    "id": "TC013",
-    "title": "Cart Service Correctly Adds, Updates, Removes Items and Calculates Totals",
-    "description": "Unit test the cart service methods for adding items, updating quantities, removing items, clearing cart, and accurately computing totals reactively.",
+    "title": "Cart Totals and Badge Accuracy",
+    "description": "Verify that the total price and item counts in the cart and navigation badge are calculated and displayed correctly for various item quantities.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Call service method to add a product."
+        "description": "Add multiple products with varying quantities to the cart."
       },
       {
         "type": "assertion",
-        "description": "Verify cart state contains the product with correct initial quantity."
+        "description": "Total price displayed in the cart matches expected sum of (price * quantity) for all items."
+      },
+      {
+        "type": "assertion",
+        "description": "Navigation toolbar badge accurately shows the sum of all item quantities."
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Checkout Process Success",
+    "description": "Verify that the checkout process completes successfully and clears the cart afterwards.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Add items to the shopping cart."
       },
       {
         "type": "action",
-        "description": "Update quantity of the product via service."
-      },
-      {
-        "type": "assertion",
-        "description": "Ensure updated quantity is reflected in cart state."
+        "description": "Navigate to the cart page."
       },
       {
         "type": "action",
-        "description": "Remove a product using service method."
+        "description": "Initiate the checkout process."
       },
       {
         "type": "assertion",
-        "description": "Validate product is removed from cart state."
-      },
-      {
-        "type": "action",
-        "description": "Invoke clear cart service method."
+        "description": "A confirmation alert is displayed showing the total amount of the purchase."
       },
       {
         "type": "assertion",
-        "description": "Confirm cart state is empty after clear."
-      },
-      {
-        "type": "assertion",
-        "description": "Throughout, test reactive total price and item count update immediately upon changes."
+        "description": "After confirming, the cart is cleared both from UI and Supabase backend."
       }
     ]
   },
   {
     "id": "TC014",
-    "title": "Verify Routing Configuration Navigates Between Views",
-    "description": "Test Angular routing configuration routes correctly to product list and cart views based on URL or navigation actions.",
+    "title": "Navigation Routes Load Correct Components",
+    "description": "Verify that navigation links load the correct components for products, cart, login, and registration pages with active states updated.",
     "category": "functional",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate programmatically or via URL to product list route."
+        "description": "Click on the 'Products' navigation link."
       },
       {
         "type": "assertion",
-        "description": "Confirm Product List component is loaded."
+        "description": "Product listing component loads and the link is visually marked active."
       },
       {
         "type": "action",
-        "description": "Navigate programmatically or via URL to cart route."
+        "description": "Click on the 'Cart' navigation link."
       },
       {
         "type": "assertion",
-        "description": "Confirm Cart component is loaded."
+        "description": "Shopping cart component loads and the link is visually marked active."
+      },
+      {
+        "type": "action",
+        "description": "Click on the 'Login' navigation link."
+      },
+      {
+        "type": "assertion",
+        "description": "Login component loads and the link is visually marked active."
+      },
+      {
+        "type": "action",
+        "description": "Click on the 'Register' navigation link."
+      },
+      {
+        "type": "assertion",
+        "description": "Registration component loads and the link is visually marked active."
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Handle Invalid Item Update in Cart",
+    "description": "Verify error handling when attempting to update the quantity of a cart item that does not exist.",
+    "category": "error handling",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Attempt to update the quantity of a non-existent item in the cart via backend API."
+      },
+      {
+        "type": "assertion",
+        "description": "System returns a 404 error indicating the item is not found."
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "Handle Removing Non-Existent Item from Cart",
+    "description": "Verify error handling when attempting to remove a cart item that does not exist.",
+    "category": "error handling",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Attempt to delete a non-existent cart item via backend API."
+      },
+      {
+        "type": "assertion",
+        "description": "System returns a 404 error indicating the item is not found."
       }
     ]
   }

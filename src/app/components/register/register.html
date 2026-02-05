@@ -17,7 +17,8 @@
             required
             email
             [disabled]="loading()"
-            autocomplete="email">
+            autocomplete="email"
+            data-testid="register-email-input">
           <mat-icon matPrefix>email</mat-icon>
         </mat-form-field>
 
@@ -32,14 +33,16 @@
             required
             minlength="6"
             [disabled]="loading()"
-            autocomplete="new-password">
+            autocomplete="new-password"
+            data-testid="register-password-input">
           <mat-icon matPrefix>lock</mat-icon>
           <button 
             mat-icon-button 
             matSuffix 
             type="button"
             (click)="togglePasswordVisibility()"
-            [disabled]="loading()">
+            [disabled]="loading()"
+            data-testid="register-toggle-password">
             <mat-icon>{{hidePassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
           </button>
           <mat-hint>Mínimo 6 caracteres</mat-hint>
@@ -55,27 +58,29 @@
             name="confirmPassword"
             required
             [disabled]="loading()"
-            autocomplete="new-password">
+            autocomplete="new-password"
+            data-testid="register-confirm-password-input">
           <mat-icon matPrefix>lock</mat-icon>
           <button 
             mat-icon-button 
             matSuffix 
             type="button"
             (click)="toggleConfirmPasswordVisibility()"
-            [disabled]="loading()">
+            [disabled]="loading()"
+            data-testid="register-toggle-confirm-password">
             <mat-icon>{{hideConfirmPassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
           </button>
         </mat-form-field>
 
         @if (error()) {
-          <div class="error-message">
+          <div class="error-message" data-testid="register-error-message">
             <mat-icon>error</mat-icon>
             <span>{{ error() }}</span>
           </div>
         }
 
         @if (success()) {
-          <div class="success-message">
+          <div class="success-message" data-testid="register-success-message">
             <mat-icon>check_circle</mat-icon>
             <span>{{ success() }}</span>
           </div>
@@ -86,7 +91,8 @@
           color="primary" 
           type="submit"
           class="full-width submit-button"
-          [disabled]="loading() || !registerForm.form.valid">
+          [disabled]="loading() || !registerForm.form.valid"
+          data-testid="register-submit-button">
           @if (loading()) {
             <mat-spinner diameter="20"></mat-spinner>
           } @else {

@@ -1,17 +1,17 @@
 {
-  "status": "init",
-  "scope": "codebase",
+  "status": "commited",
   "type": "frontend",
-  "localEndpoint": "http://localhost:4200/",
-  "serverPort": 54303,
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:4200/products",
   "executionArgs": {
     "projectName": "shopping-cart",
     "projectPath": "/Users/claudiojara/dev/agents/skills/angular/shopping-cart",
     "testIds": [],
-    "additionalInstruction": "",
+    "additionalInstruction": "Execute all frontend test cases focusing on user flows: registration, login, product browsing, cart operations (add, update quantity, remove), checkout, and logout.",
     "envs": {
       "API_KEY": "sk-user-ZHrENprBhz74kCEJlxkXDFLjRHn3UgLmXsEsPauOyaV7c3kMBvrP7elEBn9NUvFR8lsJNgnOwJyPCftKp4ydWWvz-dDAejmDEJ_yeHQoHSO53PULRqgt5Iq41lZNxrdpLAo"
     }
   },
-  "proxy": "http://6911be0d-a498-4c1e-82aa-01c9818b2053:JiXfzWOvhdtVVP3XHjsb62EzdqfID80F@tun.testsprite.com:8080"
+  "serverPort": 60057,
+  "proxy": "http://eb81a3b8-ea45-4df0-a68e-c5f537efb2a7:wSVVMXs3WfAqyzdo0iv6xFvpZ07YcVYE@tun.testsprite.com:8080"
 }

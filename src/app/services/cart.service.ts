@@ -51,12 +51,26 @@ export class CartService {
 
     this.isLoading.set(true);
     try {
+      const user = this.supabase.getCurrentUser();
+      if (!user) {
+        this.cartItems.set([]);
+        return;
+      }
+
+      console.log(`🔄 loadCartFromDb for user ${user.id}`);
+
       const { data, error } = await this.supabase.client
         .from('cart_items')
         .select('*')
+        .eq('user_id', user.id)  // ✅ Filtrar por usuario actual
         .order('created_at', { ascending: true });
 
       if (error) throw error;
+
+      console.log(`📦 Loaded ${data?.length || 0} items from DB for user ${user.id}`);
+      if (data) {
+        console.log(`   Items:`, data.map((d: any) => `product_id=${d.product_id}, qty=${d.quantity}`));
+      }
 
       if (data) {
         const cartItems: CartItem[] = (data as DbCartItem[])
@@ -73,6 +87,7 @@ export class CartService {
           .filter((item): item is CartItem => item !== null);
 
         this.cartItems.set(cartItems);
+        console.log(`✅ Cart updated: ${cartItems.length} items`);
       }
     } catch (error) {
       console.error('Error loading cart:', error);
@@ -85,6 +100,10 @@ export class CartService {
     const currentItems = this.cartItems();
     const existingItem = currentItems.find(item => item.product.id === product.id);
 
+    console.log(`🔵 addToCart called for product ${product.id} (${product.name})`);
+    console.log(`📦 Current cart items: ${currentItems.length}`);
+    console.log(`🔍 Existing item?: ${existingItem ? 'Yes, updating quantity' : 'No, adding new'}`);
+
     if (existingItem) {
       await this.updateQuantity(product.id, existingItem.quantity + 1);
     } else {
@@ -95,21 +114,27 @@ export class CartService {
       if (this.supabase.isAuthenticated()) {
         try {
           const user = this.supabase.getCurrentUser();
-          const { error } = await this.supabase.client
+          console.log(`💾 Inserting to DB: product_id=${product.id}, user_id=${user!.id}`);
+          
+          const { error, data } = await this.supabase.client
             .from('cart_items')
             .insert({
               user_id: user!.id,
               product_id: product.id,
               quantity: 1
-            });
+            })
+            .select();
 
           if (error) {
+            console.error(`❌ Insert failed:`, error);
             // Rollback on error
             this.cartItems.update(items => 
               items.filter(item => item.product.id !== product.id)
             );
             throw error;
           }
+          
+          console.log(`✅ Insert successful:`, data);
         } catch (error) {
           console.error('Error adding to cart:', error);
         }
@@ -127,10 +152,14 @@ export class CartService {
     // Sync to DB if authenticated
     if (this.supabase.isAuthenticated()) {
       try {
+        const user = this.supabase.getCurrentUser();
+        if (!user) return;
+
         const { error } = await this.supabase.client
           .from('cart_items')
           .delete()
-          .eq('product_id', productId);
+          .eq('product_id', productId)
+          .eq('user_id', user.id);  // ✅ Filtrar por usuario actual
 
         if (error) {
           // Rollback on error
@@ -164,10 +193,14 @@ export class CartService {
     // Sync to DB if authenticated
     if (this.supabase.isAuthenticated()) {
       try {
+        const user = this.supabase.getCurrentUser();
+        if (!user) return;
+
         const { error } = await this.supabase.client
           .from('cart_items')
           .update({ quantity })
-          .eq('product_id', productId);
+          .eq('product_id', productId)
+          .eq('user_id', user.id);  // ✅ Filtrar por usuario actual
 
         if (error) {
           // Rollback on error

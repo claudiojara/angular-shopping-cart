@@ -1,40 +1,40 @@
 <mat-toolbar color="primary" class="app-toolbar">
   <mat-toolbar-row>
-    <button mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+    <button mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" data-testid="navbar-home-button">
       <mat-icon>store</mat-icon>
       <span>TiendApp</span>
     </button>
 
     <span class="spacer"></span>
 
-    <button mat-button routerLink="/products" routerLinkActive="active">
+    <button mat-button routerLink="/products" routerLinkActive="active" data-testid="navbar-products-button">
       <mat-icon>inventory_2</mat-icon>
       <span>Productos</span>
     </button>
 
-    <button mat-button routerLink="/cart" routerLinkActive="active">
-      <mat-icon [matBadge]="cartItemCount()" [matBadgeHidden]="cartItemCount() === 0" matBadgeColor="accent">
+    <button mat-button routerLink="/cart" routerLinkActive="active" data-testid="navbar-cart-button">
+      <mat-icon [matBadge]="cartItemCount()" [matBadgeHidden]="cartItemCount() === 0" matBadgeColor="accent" data-testid="cart-badge">
         shopping_cart
       </mat-icon>
       <span>Carrito</span>
     </button>
 
     @if (currentUser | async; as user) {
-      <button mat-icon-button [matMenuTriggerFor]="userMenu">
+      <button mat-icon-button [matMenuTriggerFor]="userMenu" data-testid="user-menu-button">
         <mat-icon>account_circle</mat-icon>
       </button>
       <mat-menu #userMenu="matMenu">
         <div class="user-menu-header">
           <mat-icon>email</mat-icon>
-          <span>{{ user.email }}</span>
+          <span data-testid="user-menu-email">{{ user.email }}</span>
         </div>
-        <button mat-menu-item (click)="logout()">
+        <button mat-menu-item (click)="logout()" data-testid="logout-button">
           <mat-icon>logout</mat-icon>
           <span>Cerrar Sesión</span>
         </button>
       </mat-menu>
     } @else {
-      <button mat-button routerLink="/login" routerLinkActive="active">
+      <button mat-button routerLink="/login" routerLinkActive="active" data-testid="navbar-login-button">
         <mat-icon>login</mat-icon>
         <span>Iniciar Sesión</span>
       </button>
