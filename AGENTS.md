@@ -271,6 +271,43 @@ export const authGuard: CanActivateFn = () => {
 - Always check for `error` in Supabase responses
 - RLS policies handle security (users only see own data)
 
+### Critical: User Isolation in Database Operations
+
+**ALWAYS filter by `user_id` when querying user-specific data.**
+
+This project previously had a critical bug where cart operations didn't filter by `user_id`, causing users to see and modify other users' carts. This was fixed in commit `239f6ce`.
+
+**Required Pattern for All User-Specific Queries:**
+
+```typescript
+// ❌ BAD: Queries ALL users' data
+const { data } = await this.supabase.client
+  .from('cart_items')
+  .select('*');
+
+// ✅ GOOD: Filters by current user
+const user = this.supabase.getCurrentUser();
+if (!user) return;
+
+const { data } = await this.supabase.client
+  .from('cart_items')
+  .select('*')
+  .eq('user_id', user.id);  // Always add this filter
+```
+
+**All operations requiring user isolation:**
+- `.select()` - Add `.eq('user_id', user.id)`
+- `.update()` - Add `.eq('user_id', user.id)`
+- `.delete()` - Add `.eq('user_id', user.id)`
+- `.insert()` - Include `user_id: user.id` in payload
+
+**CartService Fixed Methods:**
+- `loadCartFromDb()` - cart.service.ts:65
+- `removeFromCart()` - cart.service.ts:162
+- `updateQuantity()` - cart.service.ts:203
+
+**Note:** RLS policies provide database-level security, but client-side filtering prevents bugs and improves UX by avoiding unnecessary network calls and permission errors.
+
 ## Testing
 
 ```typescript
@@ -298,6 +335,184 @@ describe('CartService', () => {
 ```
 
 Add `data-testid` attributes for E2E tests.
+
+## E2E Testing Setup & Troubleshooting
+
+### Test User Configuration
+
+The E2E tests require two test users in Supabase:
+
+**User 1 (Primary):**
+- Email: `playwright-test@example.com`
+- Password: `PlaywrightTest123!`
+- User ID: `80765d0c-7c28-4bcc-9bc7-9e92f3d3aa41`
+
+**User 2 (Multi-user tests):**
+- Email: `playwright-test2@example.com`
+- Password: `PlaywrightTest123!`
+- User ID: `200336e2-7d86-442d-b7b8-88c933540f23`
+
+### Creating Test Users
+
+1. **Via Supabase Dashboard:**
+   ```
+   Dashboard → Authentication → Users → Add User
+   - Enter email and password
+   - ✅ Auto Confirm User (important!)
+   - Click "Create User"
+   ```
+
+2. **Disable Email Confirmation (required for testing):**
+   ```
+   Dashboard → Authentication → Email Auth
+   - Toggle OFF: "Enable email confirmations"
+   ```
+
+3. **Verify RLS Policies:**
+   ```sql
+   -- Check that users can access their own cart_items
+   -- RLS policy should include: user_id = auth.uid()
+   ```
+
+4. **Verify Test Users:**
+   ```bash
+   npx ts-node e2e/setup-test-users.ts
+   ```
+
+### Common E2E Test Issues
+
+#### Issue: Tests fail with "User not found" or login errors
+
+**Solution:**
+```bash
+# Verify users exist
+npx ts-node e2e/setup-test-users.ts
+
+# Check Supabase configuration
+# Ensure .env or environment variables match:
+SUPABASE_URL=https://owewtzddyykyraxkkorx.supabase.co
+SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+#### Issue: Cart items from previous test appear
+
+**Cause:** Database not cleared between tests
+
+**Solution:**
+- Tests use `clearAllCartItems()` helper in `beforeEach`
+- Helper is in `e2e/helpers/database.helper.ts`
+- Directly deletes from `cart_items` table via Supabase
+
+```typescript
+// Pattern used in tests
+beforeEach(async ({ page }) => {
+  await clearAllCartItems(TEST_USER.email, TEST_USER.password);
+  await page.evaluate(() => { localStorage.clear(); });
+  await loginPage.login(TEST_USER.email, TEST_USER.password);
+  await page.waitForTimeout(2000); // Wait for cart load
+});
+```
+
+#### Issue: Cart count is wrong (e.g., 6 items instead of 1)
+
+**Cause:** Selector matching too many elements
+
+**Solution:** Use specific selectors in Page Objects
+```typescript
+// ❌ BAD: Matches all child elements too
+this.cartItems = page.locator('[data-testid^="cart-item-"]');
+
+// ✅ GOOD: Only matches the list item container
+this.cartItems = page.locator('mat-list-item[data-testid^="cart-item-"]');
+```
+
+#### Issue: Tests timeout waiting for cart operations
+
+**Cause:** CartService uses optimistic updates + async DB sync
+
+**Solution:** Add wait times after cart operations
+```typescript
+await productList.addProductToCart(1);
+await page.waitForTimeout(2000); // Wait for Supabase sync
+
+// Better approach (use when possible):
+await page.waitForResponse(resp => 
+  resp.url().includes('/rest/v1/cart_items') && resp.status() === 201
+);
+```
+
+#### Issue: NavigatorLockAcquireTimeoutError warnings
+
+**Cause:** Browser storage locking during rapid operations
+
+**Impact:** Warning only, tests still pass
+
+**Solution:** If tests fail:
+```typescript
+// Add delays between rapid operations
+await page.waitForTimeout(500);
+
+// Clear storage before critical operations
+await page.evaluate(() => { localStorage.clear(); });
+```
+
+#### Issue: Multi-user tests show wrong user's cart
+
+**Cause:** Cart isolation bug (should be fixed in v239f6ce)
+
+**Verify Fix:**
+```typescript
+// Check cart.service.ts has user_id filters:
+// Line 65: .eq('user_id', user.id)  // loadCartFromDb
+// Line 162: .eq('user_id', user.id) // removeFromCart
+// Line 203: .eq('user_id', user.id) // updateQuantity
+```
+
+#### Issue: RLS policy errors in console
+
+**Cause:** Database policies don't allow user access
+
+**Solution:**
+```sql
+-- cart_items table should have policy like:
+CREATE POLICY "Users can manage own cart"
+ON cart_items
+FOR ALL
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
+```
+
+### E2E Test Timing Guidelines
+
+- **After login:** `await page.waitForTimeout(2000)` - Wait for cart load from DB
+- **After add to cart:** `await page.waitForTimeout(2000)` - Wait for Supabase insert
+- **After update quantity:** `await page.waitForTimeout(1500)` - Wait for Supabase update
+- **After remove item:** `await page.waitForTimeout(1500)` - Wait for Supabase delete
+- **After navigation:** `await page.waitForTimeout(500)` - Wait for route change
+
+### Running Tests Strategically
+
+```bash
+# Run all tests (headless)
+npm run test:e2e
+
+# Debug single test file
+npm run test:e2e:ui -- authentication.spec.ts
+
+# Watch specific test
+npm run test:e2e:headed -- --grep "TC008"
+
+# See last test results with screenshots
+npm run test:e2e:report
+```
+
+### Test Files Overview
+
+- `authentication.spec.ts` - TC001-TC005 (Login/Register/Logout) - Independent tests
+- `shopping-cart.spec.ts` - TC006-TC015 (Cart operations) - ⚠️ Must run in serial mode
+- `cart-isolation.spec.ts` - Multi-user cart isolation - ⚠️ Requires both test users
+- `pages/*.page.ts` - Page Object Models with `data-testid` selectors
+- `helpers/database.helper.ts` - Direct Supabase manipulation for test setup/cleanup
 
 ## Project-Specific Rules
 
