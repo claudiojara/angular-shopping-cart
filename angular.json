@@ -27,6 +27,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "config.json",
+                "input": "src/assets",
+                "output": "/assets"
               }
             ],
             "styles": [
@@ -75,6 +80,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
+            "karmaConfig": "karma.conf.js",
             "polyfills": [
               "zone.js",
               "zone.js/testing"
@@ -89,7 +95,8 @@
             ],
             "styles": [
               "src/styles.scss"
-            ]
+            ],
+            "codeCoverage": true
           }
         }
       }

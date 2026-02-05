@@ -1,8 +1,8 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
-import { environment } from '../../environments/environment';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
+import { ConfigService } from '../core/config.service';
 
 export interface AuthUser {
   id: string;
@@ -13,6 +13,7 @@ export interface AuthUser {
   providedIn: 'root'
 })
 export class SupabaseService {
+  private configService = inject(ConfigService);
   private supabase: SupabaseClient;
   
   // Private writable signal
@@ -28,9 +29,12 @@ export class SupabaseService {
   readonly isAuthenticated = computed(() => this._currentUser() !== null);
 
   constructor() {
+    // Use runtime configuration from ConfigService
+    const config = this.configService.getConfig();
+    
     this.supabase = createClient(
-      environment.supabase.url,
-      environment.supabase.anonKey
+      config.supabase.url,
+      config.supabase.anonKey
     );
 
     // Check for existing session

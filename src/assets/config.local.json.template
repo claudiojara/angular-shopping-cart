@@ -1,0 +1,21 @@
+{
+  "production": false,
+  "supabase": {
+    "url": "https://owewtzddyykyraxkkorx.supabase.co",
+    "anonKey": "PASTE_YOUR_SUPABASE_ANON_KEY_HERE"
+  },
+  "environment": "local",
+  "features": {
+    "enableDebugMode": true,
+    "enableAnalytics": false
+  },
+  "_instructions": {
+    "howToUse": [
+      "1. Copy this file to config.local.json: cp src/assets/config.local.json.template src/assets/config.local.json",
+      "2. Replace PASTE_YOUR_SUPABASE_ANON_KEY_HERE with your actual Supabase anon key",
+      "3. The config.local.json file is gitignored and will override config.json during local development",
+      "4. Never commit config.local.json to git - it contains your local credentials"
+    ],
+    "whereToFindKeys": "Get your Supabase keys from: https://supabase.com/dashboard/project/_/settings/api"
+  }
+}

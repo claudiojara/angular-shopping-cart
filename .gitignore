@@ -48,6 +48,10 @@ __screenshots__/
 /.testsprite/
 /testsprite-report/
 
+# Runtime configuration (local overrides with real credentials)
+/src/assets/config.local.json
+/public/config.local.json
+
 # System files
 .DS_Store
 Thumbs.db
