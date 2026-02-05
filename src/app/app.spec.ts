@@ -1,21 +1,30 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { signal } from '@angular/core';
-import { of, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { App } from './app';
 import { CartService } from './services/cart.service';
 import { SupabaseService } from './services/supabase.service';
+import { routes } from './app.routes';
 
 describe('App', () => {
   let component: App;
   let fixture: ComponentFixture<App>;
   let cartServiceMock: jasmine.SpyObj<CartService>;
   let supabaseMock: jasmine.SpyObj<SupabaseService>;
-  let routerMock: jasmine.SpyObj<Router>;
-  let currentUserSubject: BehaviorSubject<any>;
+  let router: Router;
+  let currentUserSubject: BehaviorSubject<null | {
+    id: string;
+    email: string;
+    user_metadata: unknown;
+  }>;
 
   beforeEach(async () => {
-    currentUserSubject = new BehaviorSubject(null);
+    currentUserSubject = new BehaviorSubject<null | {
+      id: string;
+      email: string;
+      user_metadata: unknown;
+    }>(null);
 
     cartServiceMock = jasmine.createSpyObj('CartService', [], {
       itemCount: signal(0),
@@ -25,20 +34,19 @@ describe('App', () => {
       currentUser$: currentUserSubject.asObservable(),
     });
 
-    routerMock = jasmine.createSpyObj('Router', ['navigate']);
-
     await TestBed.configureTestingModule({
       imports: [App],
       providers: [
-        provideRouter([]),
+        provideRouter(routes),
         { provide: CartService, useValue: cartServiceMock },
         { provide: SupabaseService, useValue: supabaseMock },
-        { provide: Router, useValue: routerMock },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(App);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
     fixture.detectChanges();
   });
 
@@ -164,7 +172,7 @@ describe('App', () => {
 
       await component.logout();
 
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/login']);
+      expect(router.navigate).toHaveBeenCalledWith(['/login']);
     });
 
     it('should navigate to login even if signOut takes time', async () => {
@@ -172,7 +180,7 @@ describe('App', () => {
 
       await component.logout();
 
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/login']);
+      expect(router.navigate).toHaveBeenCalledWith(['/login']);
     });
 
     it('should handle logout errors gracefully', async () => {
@@ -191,7 +199,7 @@ describe('App', () => {
 
       await component.logout();
 
-      expect(routerMock.navigate).not.toHaveBeenCalled();
+      expect(router.navigate).not.toHaveBeenCalled();
     });
 
     it('should log specific error messages', async () => {
@@ -276,7 +284,7 @@ describe('App', () => {
       await component.logout();
 
       expect(supabaseMock.signOut).toHaveBeenCalledTimes(2);
-      expect(routerMock.navigate).toHaveBeenCalledTimes(2);
+      expect(router.navigate).toHaveBeenCalledTimes(2);
     });
 
     it('should handle logout being called before component initialization completes', async () => {
@@ -288,7 +296,7 @@ describe('App', () => {
       expect(supabaseMock.signOut).toHaveBeenCalled();
 
       await logoutPromise;
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/login']);
+      expect(router.navigate).toHaveBeenCalledWith(['/login']);
     });
 
     it('should handle rapid authentication state changes', (done) => {
