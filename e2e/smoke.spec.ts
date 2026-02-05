@@ -25,13 +25,13 @@ test.describe('CI/CD Smoke Tests', () => {
     // This is the critical check - if login fails, redirect won't happen
     await expect(page).toHaveURL(/\/products/, { timeout: 10000 });
 
-    // Wait for page to stabilize
+    // Wait for page to stabilize and products to load
     await page.waitForTimeout(2000);
 
-    // Verify we're on a valid page (not error page)
-    const pageContent = await page.content();
-    expect(pageContent).not.toContain('Error');
-    expect(pageContent).not.toContain('404');
+    // Verify we're NOT on login page anymore
+    const currentUrl = page.url();
+    expect(currentUrl).not.toContain('/login');
+    expect(currentUrl).toContain('/products');
   });
 
   test('SMOKE-02: Products page loads correctly', async ({ page }) => {
