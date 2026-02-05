@@ -529,11 +529,358 @@ npm run test:e2e:report
 
 ## Git Workflow
 
+### Local Development
+
 ```bash
-npm run build           # Test build before commit
-git add .
-git commit -m "feat: description"
-git push origin main
+# Before commit
+npm run lint:fix                # Auto-fix linting issues
+npm run format                  # Format code
+npm test                        # Run unit tests
+npm run build:prod              # Test production build
 ```
 
+### Commit Strategy
+
+Use [Conventional Commits](https://www.conventionalcommits.org/):
+
+```bash
+git add .
+git commit -m "feat: add product filters"
+git commit -m "fix: cart not persisting after logout"
+git commit -m "docs: update README with CI/CD info"
+git commit -m "test: add E2E test for checkout flow"
+```
+
+### Branching Strategy
+
+```
+main         Production (protected)
+  │
+develop      Staging (protected)
+  │
+feature/*    Feature branches
+fix/*        Bug fixes
+```
+
+**Workflow:**
+1. Create feature branch from `develop`
+2. Make changes and commit
+3. Open PR to `develop` → CI runs
+4. Merge to `develop` → Deploy to staging
+5. Create PR from `develop` to `main`
+6. Merge to `main` → Deploy to production
+
 **Repository:** https://github.com/claudiojara/angular-shopping-cart
+
+## CI/CD Architecture
+
+### Overview
+
+This project uses **GitHub Actions** for CI/CD with automatic deployment to **Azure Static Web Apps**.
+
+### Environments
+
+| Environment | Branch | URL | Deployment |
+|------------|--------|-----|------------|
+| **Production** | `main` | https://witty-bush-0d65a3d0f.2.azurestaticapps.net | Auto on push to main |
+| **Staging** | `develop` | https://witty-bush-0d65a3d0f-develop.2.azurestaticapps.net | Auto on push to develop |
+
+### Workflows
+
+#### 1. CI Workflow (`ci.yml`)
+**Trigger:** Pull requests to `develop` or `main`, push to `develop`
+
+**Steps:**
+1. Setup Node.js 22 (from `.nvmrc`)
+2. Install dependencies (`npm ci`)
+3. Prettier check (`npm run format:check`)
+4. ESLint (`npm run lint` - warnings allowed)
+5. Unit tests with coverage (`npm run test:ci`)
+6. Upload coverage to Codecov
+7. Production build (`npm run build:prod`)
+8. Bundle size analysis (`npm run analyze:size`)
+
+**Duration:** ~3-5 minutes
+
+#### 2. Deploy to Staging (`deploy-staging.yml`)
+**Trigger:** Push to `develop`
+
+**Steps:**
+1. All CI checks (lint, tests, build)
+2. Generate runtime config (`scripts/generate-config.sh`)
+   - Replaces `__SUPABASE_URL__` → `${{ secrets.SUPABASE_URL }}`
+   - Replaces `__SUPABASE_KEY__` → `${{ secrets.SUPABASE_KEY }}`
+3. Deploy to Azure Static Web Apps (preview environment)
+4. Wait for deployment (`npx wait-on`)
+5. Install Playwright browsers
+6. Run E2E tests against staging URL
+7. Upload Playwright report as artifact
+
+**Duration:** ~5-8 minutes
+
+#### 3. Deploy to Production (`deploy-production.yml`)
+**Trigger:** Push to `main`
+
+**Steps:**
+1. Prettier check
+2. ESLint in **strict mode** (`--max-warnings=0`)
+3. Unit tests with coverage (fail if coverage drops)
+4. Build production
+5. Bundle size analysis
+6. Generate runtime config
+7. Deploy to Azure Static Web Apps (production)
+8. Wait for deployment
+9. Run E2E tests against production URL
+10. Create GitHub Release (tag: `v{run_number}`)
+11. Upload Playwright report
+
+**Duration:** ~6-10 minutes
+
+### Quality Gates
+
+| Quality Gate | Staging | Production | Threshold |
+|-------------|---------|------------|-----------|
+| **Prettier** | ✅ Required | ✅ Required | All files formatted |
+| **ESLint** | ⚠️ Warnings OK | ❌ Strict | 0 errors (staging: 0 warnings) |
+| **Unit Tests** | ✅ Required | ✅ Required | All passing |
+| **Code Coverage** | ⚠️ Target 60% | ✅ Required 60% | Global: 60%, Patch: 50% |
+| **Build** | ✅ Required | ✅ Required | No errors |
+| **Bundle Size** | ⚠️ Warn >500KB, ❌ >1MB | ⚠️ Warn >500KB, ❌ >1MB | Per file |
+| **E2E Tests** | ✅ 14/14 | ✅ 14/14 | All passing |
+
+### Configuration System
+
+#### Runtime Configuration Strategy
+
+The project uses **runtime configuration** instead of build-time environment variables.
+
+**Why?**
+- ✅ Single build works for multiple environments
+- ✅ Can change config without rebuild
+- ✅ More secure (secrets not in bundle)
+- ✅ Compatible with Azure Static Web Apps
+
+**How it works:**
+
+1. **Development (Local):**
+   - File: `src/assets/config.local.json` (gitignored)
+   - Contains real Supabase credentials
+   - Loaded first by ConfigService
+
+2. **CI/CD (Staging & Production):**
+   - File: `src/assets/config.json` (committed with placeholders)
+   - Placeholders: `__SUPABASE_URL__`, `__SUPABASE_KEY__`
+   - Script `generate-config.sh` replaces placeholders during deployment
+
+**ConfigService loading priority:**
+```typescript
+// 1. Try to load config.local.json (development)
+// 2. If fails, load config.json (production/staging)
+```
+
+**Example config.json:**
+```json
+{
+  "production": false,
+  "supabase": {
+    "url": "__SUPABASE_URL__",
+    "anonKey": "__SUPABASE_KEY__"
+  },
+  "environment": "development"
+}
+```
+
+#### GitHub Secrets
+
+Required secrets configured in repository settings:
+
+```bash
+AZURE_STATIC_WEB_APPS_API_TOKEN  # Azure deployment token
+SUPABASE_URL                      # https://xxxxx.supabase.co
+SUPABASE_KEY                      # eyJhbGciOiJIUzI1NiI...
+PLAYWRIGHT_TEST_EMAIL             # playwright-test@example.com
+PLAYWRIGHT_TEST_PASSWORD          # PlaywrightTest123!
+PLAYWRIGHT_TEST2_EMAIL            # playwright-test2@example.com
+PLAYWRIGHT_TEST2_PASSWORD         # PlaywrightTest123!
+CODECOV_TOKEN                     # Codecov upload token
+```
+
+### Deployment Process
+
+#### When PR is opened to `develop`:
+```
+Developer pushes to feature branch
+    ↓
+Opens PR to develop
+    ↓
+CI Workflow runs (lint, tests, build)
+    ↓
+Review & approval
+    ↓
+Merge to develop
+```
+
+#### When merged to `develop`:
+```
+Merge to develop
+    ↓
+Deploy to Staging Workflow runs
+    ↓
+Build & deploy to Azure (preview environment)
+    ↓
+E2E tests run against staging URL
+    ↓
+Playwright report uploaded
+    ↓
+Staging live: https://...develop.2.azurestaticapps.net
+```
+
+#### When merged to `main`:
+```
+Merge to main (from develop PR)
+    ↓
+Deploy to Production Workflow runs
+    ↓
+Strict quality gates (ESLint --max-warnings=0)
+    ↓
+Build & deploy to Azure (production)
+    ↓
+E2E tests run against production URL
+    ↓
+GitHub Release created (v{run_number})
+    ↓
+Production live: https://witty-bush-0d65a3d0f.2.azurestaticapps.net
+```
+
+### Scripts
+
+#### `scripts/generate-config.sh`
+Replaces placeholders in `dist/shopping-cart/browser/assets/config.json` with environment variables.
+
+**Usage in CI:**
+```bash
+SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} \
+bash scripts/generate-config.sh
+```
+
+#### `scripts/setup-local.sh`
+Sets up local development environment:
+- Installs dependencies
+- Creates `config.local.json` from template
+- Installs Playwright browsers
+
+**Usage:**
+```bash
+npm run setup
+```
+
+#### `scripts/check-bundle-size.js`
+Analyzes bundle sizes and fails if thresholds exceeded.
+
+**Thresholds:**
+- Warning: >500KB per file
+- Error: >1MB per file
+
+**Usage:**
+```bash
+npm run analyze:size
+```
+
+### Monitoring & Debugging
+
+#### GitHub Actions
+- **View runs:** https://github.com/claudiojara/angular-shopping-cart/actions
+- **Logs:** Available for each workflow step
+- **Artifacts:** Playwright reports, coverage reports
+
+#### Codecov
+- **Dashboard:** https://codecov.io/gh/claudiojara/angular-shopping-cart
+- **PR Comments:** Coverage diff on each PR
+- **Graphs:** Coverage trends over time
+
+#### Azure Static Web Apps
+- **Portal:** https://portal.azure.com
+- **Logs:** Available in Azure portal
+- **Preview environments:** Auto-created for `develop` branch
+
+#### Bundle Analysis
+```bash
+# Local analysis
+npm run build:prod
+npm run analyze:size
+
+# View detailed stats
+npx webpack-bundle-analyzer dist/shopping-cart/browser/stats.json
+```
+
+### Troubleshooting CI/CD
+
+#### CI fails with "ChromeHeadlessCI not found"
+**Solution:** Already configured in `karma.conf.js`. Ensure `npm run test:ci` uses `--browsers=ChromeHeadlessCI`.
+
+#### E2E fails in CI but passes locally
+**Causes:**
+- Test users not in Supabase
+- Email confirmation enabled (should be disabled)
+- Network timeout (increase wait times)
+
+**Solution:** Verify test users exist and email confirmation is disabled.
+
+#### Deployment succeeds but app doesn't load config
+**Causes:**
+- `generate-config.sh` didn't run
+- GitHub Secrets not set
+- Config file not in build output
+
+**Debug:**
+```bash
+# Check if config.json exists in build
+ls -la dist/shopping-cart/browser/assets/config.json
+
+# Check config content
+cat dist/shopping-cart/browser/assets/config.json
+```
+
+#### Bundle size exceeds limit
+**Solution:**
+1. Review dependencies: `npm run analyze:size`
+2. Remove unused Material modules
+3. Implement lazy loading for routes
+4. Consider code splitting
+
+### Best Practices for Agents
+
+When working on this project:
+
+1. **Always run quality checks before committing:**
+   ```bash
+   npm run lint:fix
+   npm run format
+   npm test
+   npm run build:prod
+   ```
+
+2. **Test E2E locally before opening PR** (if changes affect UI):
+   ```bash
+   npm run test:e2e:headed
+   ```
+
+3. **Check bundle size impact** for new dependencies:
+   ```bash
+   npm run build:prod
+   npm run analyze:size
+   ```
+
+4. **Follow conventional commits** for automatic release notes
+
+5. **Update documentation** if adding new features or changing architecture
+
+6. **Verify CI passes** before requesting review on PR
+
+7. **Test in staging** before merging to main:
+   - Merge to develop first
+   - Wait for staging deployment
+   - Manually test critical flows
+   - Then create PR to main
+
