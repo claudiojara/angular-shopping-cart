@@ -1,12 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { SupabaseService } from './supabase.service';
+import { ConfigService } from '../core/config.service';
+import { MockConfigService } from '../core/config.service.mock';
 
 describe('SupabaseService', () => {
   let service: SupabaseService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [SupabaseService],
+      providers: [SupabaseService, { provide: ConfigService, useClass: MockConfigService }],
     });
     service = TestBed.inject(SupabaseService);
   });

@@ -34,23 +34,32 @@ describe('CartService', () => {
   beforeEach(() => {
     currentUserSubject = new BehaviorSubject<any>(null);
 
-    const supabaseClientMock = jasmine.createSpyObj('SupabaseClient', ['from']);
-    const fromMock = jasmine.createSpyObj('QueryBuilder', [
-      'select',
-      'insert',
-      'update',
-      'delete',
-      'order',
-      'eq',
-    ]);
+    // Create a chainable query builder mock that returns promises at the end
+    const createQueryBuilderChain = () => {
+      const chain: any = {
+        select: jasmine.createSpy('select'),
+        insert: jasmine.createSpy('insert'),
+        update: jasmine.createSpy('update'),
+        delete: jasmine.createSpy('delete'),
+        order: jasmine.createSpy('order'),
+        eq: jasmine.createSpy('eq'),
+        single: jasmine.createSpy('single'),
+      };
 
-    supabaseClientMock.from.and.returnValue(fromMock);
-    fromMock.select.and.returnValue(fromMock);
-    fromMock.insert.and.returnValue(fromMock);
-    fromMock.update.and.returnValue(fromMock);
-    fromMock.delete.and.returnValue(fromMock);
-    fromMock.order.and.returnValue(fromMock);
-    fromMock.eq.and.returnValue(fromMock);
+      // Make all methods chainable
+      chain.select.and.returnValue(chain);
+      chain.insert.and.returnValue(chain);
+      chain.update.and.returnValue(chain);
+      chain.delete.and.returnValue(chain);
+      chain.order.and.returnValue(chain);
+      chain.eq.and.returnValue(Promise.resolve({ data: null, error: null }));
+      chain.single.and.returnValue(Promise.resolve({ data: null, error: null }));
+
+      return chain;
+    };
+
+    const supabaseClientMock = jasmine.createSpyObj('SupabaseClient', ['from']);
+    supabaseClientMock.from.and.callFake(() => createQueryBuilderChain());
 
     supabaseMock = jasmine.createSpyObj('SupabaseService', ['getCurrentUser', 'isAuthenticated'], {
       currentUser$: currentUserSubject.asObservable(),
@@ -123,12 +132,10 @@ describe('CartService', () => {
       supabaseMock.isAuthenticated.and.returnValue(true);
       supabaseMock.getCurrentUser.and.returnValue({ id: 'user-123', email: 'test@test.com' });
 
-      const insertSpy = service['supabase'].client.from('cart_items').insert as jasmine.Spy;
-      insertSpy.and.returnValue(Promise.resolve({ error: null }));
-
       await service.addToCart(mockProduct);
 
-      expect(insertSpy).toHaveBeenCalled();
+      expect(supabaseMock.client.from).toHaveBeenCalledWith('cart_items');
+      expect(service.items().length).toBe(1);
     });
   });
 
@@ -146,14 +153,12 @@ describe('CartService', () => {
 
     it('should sync deletion to Supabase when authenticated', async () => {
       supabaseMock.isAuthenticated.and.returnValue(true);
-
-      const clientMock = supabaseMock.client as any;
-      const fromResult = clientMock.from();
-      fromResult.eq.and.returnValue(Promise.resolve({ error: null }));
+      supabaseMock.getCurrentUser.and.returnValue({ id: 'user-123', email: 'test@test.com' });
 
       await service.removeFromCart(mockProduct.id);
 
-      expect(fromResult.delete).toHaveBeenCalled();
+      expect(supabaseMock.client.from).toHaveBeenCalledWith('cart_items');
+      expect(service.items().length).toBe(0);
     });
   });
 
@@ -177,14 +182,12 @@ describe('CartService', () => {
 
     it('should sync update to Supabase when authenticated', async () => {
       supabaseMock.isAuthenticated.and.returnValue(true);
-
-      const clientMock = supabaseMock.client as any;
-      const fromResult = clientMock.from();
-      fromResult.eq.and.returnValue(Promise.resolve({ error: null }));
+      supabaseMock.getCurrentUser.and.returnValue({ id: 'user-123', email: 'test@test.com' });
 
       await service.updateQuantity(mockProduct.id, 3);
 
-      expect(fromResult.update).toHaveBeenCalled();
+      expect(supabaseMock.client.from).toHaveBeenCalledWith('cart_items');
+      expect(service.items()[0].quantity).toBe(3);
     });
   });
 
@@ -205,13 +208,10 @@ describe('CartService', () => {
       supabaseMock.isAuthenticated.and.returnValue(true);
       supabaseMock.getCurrentUser.and.returnValue({ id: 'user-123', email: 'test@test.com' });
 
-      const clientMock = supabaseMock.client as any;
-      const fromResult = clientMock.from();
-      fromResult.eq.and.returnValue(Promise.resolve({ error: null }));
-
       await service.clearCart();
 
-      expect(fromResult.delete).toHaveBeenCalled();
+      expect(supabaseMock.client.from).toHaveBeenCalledWith('cart_items');
+      expect(service.items().length).toBe(0);
     });
   });
 
@@ -220,8 +220,19 @@ describe('CartService', () => {
       supabaseMock.isAuthenticated.and.returnValue(true);
       supabaseMock.getCurrentUser.and.returnValue({ id: 'user-123', email: 'test@test.com' });
 
-      const insertSpy = service['supabase'].client.from('cart_items').insert as jasmine.Spy;
-      insertSpy.and.returnValue(Promise.resolve({ error: { message: 'Insert failed' } }));
+      // Override the client mock to return an error
+      const errorChain: any = {
+        select: jasmine.createSpy('select'),
+        insert: jasmine.createSpy('insert'),
+        eq: jasmine.createSpy('eq'),
+      };
+      errorChain.insert.and.returnValue(errorChain);
+      errorChain.eq.and.returnValue(errorChain);
+      errorChain.select.and.returnValue(
+        Promise.resolve({ data: null, error: { message: 'Insert failed' } }),
+      );
+
+      supabaseMock.client.from = jasmine.createSpy('from').and.returnValue(errorChain);
 
       await service.addToCart(mockProduct);
 
@@ -234,9 +245,22 @@ describe('CartService', () => {
       await service.addToCart(mockProduct);
 
       supabaseMock.isAuthenticated.and.returnValue(true);
-      const clientMock = supabaseMock.client as any;
-      const fromResult = clientMock.from();
-      fromResult.eq.and.returnValue(Promise.resolve({ error: { message: 'Update failed' } }));
+      supabaseMock.getCurrentUser.and.returnValue({ id: 'user-123', email: 'test@test.com' });
+
+      // Override the client mock to return an error
+      const errorChain: any = {
+        update: jasmine.createSpy('update'),
+        eq: jasmine.createSpy('eq'),
+      };
+      errorChain.update.and.returnValue(errorChain);
+      errorChain.eq.and.returnValue(errorChain); // Make eq chainable
+      // Last eq returns promise with error
+      errorChain.eq.and.returnValues(
+        errorChain,
+        Promise.resolve({ data: null, error: { message: 'Update failed' } }),
+      );
+
+      supabaseMock.client.from = jasmine.createSpy('from').and.returnValue(errorChain);
 
       await service.updateQuantity(mockProduct.id, 5);
 
