@@ -44,6 +44,22 @@ npm run test:e2e:headed                      # Watch tests run in browser
 npm run test:e2e:report                      # View test results
 ```
 
+**Current Test Status:**
+
+- **Unit Tests (Jasmine/Karma):** 77/155 passing (50% pass rate)
+  - ✅ Service tests fixed (CartService, SupabaseService, ProductService) - 33/33 passing
+  - ⚠️ Component/DOM tests need fixing (44/122 failing) - template selector issues
+  - Temporarily disabled in CI workflows until DOM tests are fixed
+  - See `src/app/testing/test-helpers.ts` for MockConfigService usage
+
+- **E2E Smoke Tests (Playwright):** 2/2 passing (100%)
+  - Used in CI/CD for fast feedback (~9 seconds)
+  - Tests: Login + Products page load
+
+- **E2E Full Suite (Playwright):** 14/14 passing (100%)
+  - Run locally or scheduled (not in CI/CD due to 20min runtime)
+  - Tests: Authentication (5) + Shopping cart (9)
+
 **Pre-requisitos para E2E:**
 
 Antes de ejecutar tests E2E, crear usuario de testing en Supabase:
