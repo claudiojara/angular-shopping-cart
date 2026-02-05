@@ -16,32 +16,29 @@ describe('Cart', () => {
     description: 'Test Description',
     price: 99.99,
     image: 'https://test.com/image.jpg',
-    category: 'Test'
+    category: 'Test',
   };
 
-  const mockCartItems: CartItem[] = [
-    { product: mockProduct, quantity: 2 }
-  ];
+  const mockCartItems: CartItem[] = [{ product: mockProduct, quantity: 2 }];
 
   beforeEach(async () => {
     const itemsSignal = signal(mockCartItems);
     const totalSignal = computed(() => 199.98);
     const itemCountSignal = computed(() => 2);
 
-    cartServiceMock = jasmine.createSpyObj('CartService', 
+    cartServiceMock = jasmine.createSpyObj(
+      'CartService',
       ['updateQuantity', 'removeFromCart', 'clearCart'],
       {
         items: itemsSignal.asReadonly(),
         total: totalSignal,
-        itemCount: itemCountSignal
-      }
+        itemCount: itemCountSignal,
+      },
     );
 
     await TestBed.configureTestingModule({
       imports: [Cart],
-      providers: [
-        { provide: CartService, useValue: cartServiceMock }
-      ]
+      providers: [{ provide: CartService, useValue: cartServiceMock }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Cart);
@@ -83,19 +80,19 @@ describe('Cart', () => {
   it('should not remove item if it does not exist', () => {
     const emptyItemsSignal = signal([]);
     Object.defineProperty(cartServiceMock, 'items', {
-      value: emptyItemsSignal.asReadonly()
+      value: emptyItemsSignal.asReadonly(),
     });
-    
+
     component.removeItem(999);
-    
+
     expect(cartServiceMock.removeFromCart).not.toHaveBeenCalled();
   });
 
   it('should show alert and clear cart on checkout', () => {
     spyOn(window, 'alert');
-    
+
     component.checkout();
-    
+
     expect(window.alert).toHaveBeenCalledWith('¡Gracias por tu compra! Total: 199.98');
     expect(cartServiceMock.clearCart).toHaveBeenCalled();
   });
@@ -103,14 +100,14 @@ describe('Cart', () => {
   it('should render cart items', () => {
     const compiled = fixture.nativeElement;
     const items = compiled.querySelectorAll('mat-list-item');
-    
+
     expect(items.length).toBeGreaterThan(0);
   });
 
   it('should display total in template', () => {
     const compiled = fixture.nativeElement;
     const totalElement = compiled.querySelector('[data-testid="cart-total"]');
-    
+
     if (totalElement) {
       expect(totalElement.textContent).toContain('199.98');
     }

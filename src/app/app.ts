@@ -21,16 +21,16 @@ import { SupabaseService } from './services/supabase.service';
     MatButtonModule,
     MatIconModule,
     MatBadgeModule,
-    MatMenuModule
+    MatMenuModule,
   ],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
 })
 export class App {
   private cartService = inject(CartService);
   private supabase = inject(SupabaseService);
   private router = inject(Router);
-  
+
   cartItemCount = this.cartService.itemCount;
   currentUser = this.supabase.currentUser$;
 

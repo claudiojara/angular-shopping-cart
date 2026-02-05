@@ -18,7 +18,7 @@ import { Product } from '../../models/product.model';
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
-    MatTooltipModule
+    MatTooltipModule,
   ],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',

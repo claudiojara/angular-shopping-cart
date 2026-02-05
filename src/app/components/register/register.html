@@ -8,9 +8,9 @@
       <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Correo Electrónico</mat-label>
-          <input 
-            matInput 
-            type="email" 
+          <input
+            matInput
+            type="email"
             [ngModel]="email()"
             (ngModelChange)="email.set($event)"
             name="email"
@@ -18,14 +18,15 @@
             email
             [disabled]="loading()"
             autocomplete="email"
-            data-testid="register-email-input">
+            data-testid="register-email-input"
+          />
           <mat-icon matPrefix>email</mat-icon>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Contraseña</mat-label>
-          <input 
-            matInput 
+          <input
+            matInput
             [type]="hidePassword() ? 'password' : 'text'"
             [ngModel]="password()"
             (ngModelChange)="password.set($event)"
@@ -34,24 +35,26 @@
             minlength="6"
             [disabled]="loading()"
             autocomplete="new-password"
-            data-testid="register-password-input">
+            data-testid="register-password-input"
+          />
           <mat-icon matPrefix>lock</mat-icon>
-          <button 
-            mat-icon-button 
-            matSuffix 
+          <button
+            mat-icon-button
+            matSuffix
             type="button"
             (click)="togglePasswordVisibility()"
             [disabled]="loading()"
-            data-testid="register-toggle-password">
-            <mat-icon>{{hidePassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
+            data-testid="register-toggle-password"
+          >
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
           <mat-hint>Mínimo 6 caracteres</mat-hint>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Confirmar Contraseña</mat-label>
-          <input 
-            matInput 
+          <input
+            matInput
             [type]="hideConfirmPassword() ? 'password' : 'text'"
             [ngModel]="confirmPassword()"
             (ngModelChange)="confirmPassword.set($event)"
@@ -59,16 +62,18 @@
             required
             [disabled]="loading()"
             autocomplete="new-password"
-            data-testid="register-confirm-password-input">
+            data-testid="register-confirm-password-input"
+          />
           <mat-icon matPrefix>lock</mat-icon>
-          <button 
-            mat-icon-button 
-            matSuffix 
+          <button
+            mat-icon-button
+            matSuffix
             type="button"
             (click)="toggleConfirmPasswordVisibility()"
             [disabled]="loading()"
-            data-testid="register-toggle-confirm-password">
-            <mat-icon>{{hideConfirmPassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
+            data-testid="register-toggle-confirm-password"
+          >
+            <mat-icon>{{ hideConfirmPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
         </mat-form-field>
 
@@ -86,13 +91,14 @@
           </div>
         }
 
-        <button 
-          mat-raised-button 
-          color="primary" 
+        <button
+          mat-raised-button
+          color="primary"
           type="submit"
           class="full-width submit-button"
           [disabled]="loading() || !registerForm.form.valid"
-          data-testid="register-submit-button">
+          data-testid="register-submit-button"
+        >
           @if (loading()) {
             <mat-spinner diameter="20"></mat-spinner>
           } @else {

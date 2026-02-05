@@ -6,7 +6,7 @@ describe('SupabaseService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [SupabaseService]
+      providers: [SupabaseService],
     });
     service = TestBed.inject(SupabaseService);
   });
@@ -24,7 +24,7 @@ describe('SupabaseService', () => {
   });
 
   it('should expose currentUser$ observable', (done) => {
-    service.currentUser$.subscribe(user => {
+    service.currentUser$.subscribe((user) => {
       expect(user).toBeNull();
       done();
     });

@@ -22,10 +22,10 @@ import { SupabaseService } from '../../services/supabase.service';
     MatInputModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    MatIconModule
+    MatIconModule,
   ],
   templateUrl: './login.html',
-  styleUrl: './login.scss'
+  styleUrl: './login.scss',
 })
 export class LoginComponent {
   private supabase = inject(SupabaseService);

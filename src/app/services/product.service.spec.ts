@@ -6,7 +6,7 @@ describe('ProductService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ProductService]
+      providers: [ProductService],
     });
     service = TestBed.inject(ProductService);
   });
@@ -47,7 +47,7 @@ describe('ProductService', () => {
   it('should have products in correct categories', () => {
     const products = service.getProducts;
     const categories = products().map((p: any) => p.category);
-    
+
     expect(categories).toContain('Electrónica');
     expect(categories).toContain('Audio');
     expect(categories).toContain('Móviles');

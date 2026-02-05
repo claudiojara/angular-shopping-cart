@@ -17,7 +17,7 @@ describe('CartService', () => {
     description: 'Test Description',
     price: 99.99,
     image: 'https://test.com/image.jpg',
-    category: 'Test'
+    category: 'Test',
   };
 
   const mockDbCartItems = [
@@ -27,16 +27,23 @@ describe('CartService', () => {
       product_id: 1,
       quantity: 2,
       created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-01T00:00:00Z'
-    }
+      updated_at: '2024-01-01T00:00:00Z',
+    },
   ];
 
   beforeEach(() => {
     currentUserSubject = new BehaviorSubject<any>(null);
 
     const supabaseClientMock = jasmine.createSpyObj('SupabaseClient', ['from']);
-    const fromMock = jasmine.createSpyObj('QueryBuilder', ['select', 'insert', 'update', 'delete', 'order', 'eq']);
-    
+    const fromMock = jasmine.createSpyObj('QueryBuilder', [
+      'select',
+      'insert',
+      'update',
+      'delete',
+      'order',
+      'eq',
+    ]);
+
     supabaseClientMock.from.and.returnValue(fromMock);
     fromMock.select.and.returnValue(fromMock);
     fromMock.insert.and.returnValue(fromMock);
@@ -47,7 +54,7 @@ describe('CartService', () => {
 
     supabaseMock = jasmine.createSpyObj('SupabaseService', ['getCurrentUser', 'isAuthenticated'], {
       currentUser$: currentUserSubject.asObservable(),
-      client: supabaseClientMock
+      client: supabaseClientMock,
     });
 
     productServiceMock = jasmine.createSpyObj('ProductService', ['getProductById']);
@@ -57,8 +64,8 @@ describe('CartService', () => {
       providers: [
         CartService,
         { provide: SupabaseService, useValue: supabaseMock },
-        { provide: ProductService, useValue: productServiceMock }
-      ]
+        { provide: ProductService, useValue: productServiceMock },
+      ],
     });
 
     service = TestBed.inject(CartService);
@@ -79,14 +86,14 @@ describe('CartService', () => {
       supabaseMock.isAuthenticated.and.returnValue(false);
       await service.addToCart(mockProduct);
       await service.addToCart(mockProduct);
-      
+
       expect(service.itemCount()).toBe(2);
     });
 
     it('should calculate total correctly', async () => {
       supabaseMock.isAuthenticated.and.returnValue(false);
       await service.addToCart(mockProduct);
-      
+
       expect(service.total()).toBe(99.99);
     });
   });
@@ -94,9 +101,9 @@ describe('CartService', () => {
   describe('addToCart', () => {
     it('should add new product to cart', async () => {
       supabaseMock.isAuthenticated.and.returnValue(false);
-      
+
       await service.addToCart(mockProduct);
-      
+
       expect(service.items().length).toBe(1);
       expect(service.items()[0].product).toEqual(mockProduct);
       expect(service.items()[0].quantity).toBe(1);
@@ -104,10 +111,10 @@ describe('CartService', () => {
 
     it('should increase quantity if product already exists', async () => {
       supabaseMock.isAuthenticated.and.returnValue(false);
-      
+
       await service.addToCart(mockProduct);
       await service.addToCart(mockProduct);
-      
+
       expect(service.items().length).toBe(1);
       expect(service.items()[0].quantity).toBe(2);
     });
@@ -115,12 +122,12 @@ describe('CartService', () => {
     it('should sync to Supabase when authenticated', async () => {
       supabaseMock.isAuthenticated.and.returnValue(true);
       supabaseMock.getCurrentUser.and.returnValue({ id: 'user-123', email: 'test@test.com' });
-      
+
       const insertSpy = service['supabase'].client.from('cart_items').insert as jasmine.Spy;
       insertSpy.and.returnValue(Promise.resolve({ error: null }));
-      
+
       await service.addToCart(mockProduct);
-      
+
       expect(insertSpy).toHaveBeenCalled();
     });
   });
@@ -133,19 +140,19 @@ describe('CartService', () => {
 
     it('should remove product from cart', async () => {
       await service.removeFromCart(mockProduct.id);
-      
+
       expect(service.items().length).toBe(0);
     });
 
     it('should sync deletion to Supabase when authenticated', async () => {
       supabaseMock.isAuthenticated.and.returnValue(true);
-      
+
       const clientMock = supabaseMock.client as any;
       const fromResult = clientMock.from();
       fromResult.eq.and.returnValue(Promise.resolve({ error: null }));
-      
+
       await service.removeFromCart(mockProduct.id);
-      
+
       expect(fromResult.delete).toHaveBeenCalled();
     });
   });
@@ -158,25 +165,25 @@ describe('CartService', () => {
 
     it('should update product quantity', async () => {
       await service.updateQuantity(mockProduct.id, 5);
-      
+
       expect(service.items()[0].quantity).toBe(5);
     });
 
     it('should remove product if quantity is 0', async () => {
       await service.updateQuantity(mockProduct.id, 0);
-      
+
       expect(service.items().length).toBe(0);
     });
 
     it('should sync update to Supabase when authenticated', async () => {
       supabaseMock.isAuthenticated.and.returnValue(true);
-      
+
       const clientMock = supabaseMock.client as any;
       const fromResult = clientMock.from();
       fromResult.eq.and.returnValue(Promise.resolve({ error: null }));
-      
+
       await service.updateQuantity(mockProduct.id, 3);
-      
+
       expect(fromResult.update).toHaveBeenCalled();
     });
   });
@@ -189,7 +196,7 @@ describe('CartService', () => {
 
     it('should clear all items from cart', async () => {
       await service.clearCart();
-      
+
       expect(service.items().length).toBe(0);
       expect(service.itemCount()).toBe(0);
     });
@@ -197,13 +204,13 @@ describe('CartService', () => {
     it('should sync clear to Supabase when authenticated', async () => {
       supabaseMock.isAuthenticated.and.returnValue(true);
       supabaseMock.getCurrentUser.and.returnValue({ id: 'user-123', email: 'test@test.com' });
-      
+
       const clientMock = supabaseMock.client as any;
       const fromResult = clientMock.from();
       fromResult.eq.and.returnValue(Promise.resolve({ error: null }));
-      
+
       await service.clearCart();
-      
+
       expect(fromResult.delete).toHaveBeenCalled();
     });
   });
@@ -212,12 +219,12 @@ describe('CartService', () => {
     it('should rollback on insert error', async () => {
       supabaseMock.isAuthenticated.and.returnValue(true);
       supabaseMock.getCurrentUser.and.returnValue({ id: 'user-123', email: 'test@test.com' });
-      
+
       const insertSpy = service['supabase'].client.from('cart_items').insert as jasmine.Spy;
       insertSpy.and.returnValue(Promise.resolve({ error: { message: 'Insert failed' } }));
-      
+
       await service.addToCart(mockProduct);
-      
+
       // Should rollback and remove the optimistically added item
       expect(service.items().length).toBe(0);
     });
@@ -225,14 +232,14 @@ describe('CartService', () => {
     it('should rollback on update error', async () => {
       supabaseMock.isAuthenticated.and.returnValue(false);
       await service.addToCart(mockProduct);
-      
+
       supabaseMock.isAuthenticated.and.returnValue(true);
       const clientMock = supabaseMock.client as any;
       const fromResult = clientMock.from();
       fromResult.eq.and.returnValue(Promise.resolve({ error: { message: 'Update failed' } }));
-      
+
       await service.updateQuantity(mockProduct.id, 5);
-      
+
       // Should rollback to original quantity
       expect(service.items()[0].quantity).toBe(1);
     });

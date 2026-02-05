@@ -1,4 +1,9 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, APP_INITIALIZER } from '@angular/core';
+import {
+  ApplicationConfig,
+  provideBrowserGlobalErrorListeners,
+  provideZoneChangeDetection,
+  APP_INITIALIZER,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
@@ -11,12 +16,15 @@ import { ConfigService } from './core/config.service';
  */
 export function initializeApp(configService: ConfigService) {
   return (): Promise<void> => {
-    return configService.loadConfig().then(() => {
-      console.log('✅ Application configuration loaded successfully');
-    }).catch((error) => {
-      console.error('❌ Failed to load application configuration:', error);
-      throw error;
-    });
+    return configService
+      .loadConfig()
+      .then(() => {
+        console.log('✅ Application configuration loaded successfully');
+      })
+      .catch((error) => {
+        console.error('❌ Failed to load application configuration:', error);
+        throw error;
+      });
   };
 }
 
@@ -30,7 +38,7 @@ export const appConfig: ApplicationConfig = {
       provide: APP_INITIALIZER,
       useFactory: initializeApp,
       deps: [ConfigService],
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 };

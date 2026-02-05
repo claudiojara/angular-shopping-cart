@@ -18,8 +18,8 @@ describe('RegisterComponent', () => {
       providers: [
         provideRouter([]),
         { provide: SupabaseService, useValue: supabaseMock },
-        { provide: Router, useValue: routerMock }
-      ]
+        { provide: Router, useValue: routerMock },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(RegisterComponent);
@@ -174,7 +174,7 @@ describe('RegisterComponent', () => {
     it('should call signUp with correct credentials', async () => {
       const email = 'test@example.com';
       const password = 'password123';
-      
+
       await component.onSubmit();
 
       expect(supabaseMock.signUp).toHaveBeenCalledWith(email, password);
@@ -183,7 +183,9 @@ describe('RegisterComponent', () => {
     it('should show success message after registration', async () => {
       await component.onSubmit();
 
-      expect(component.success()).toBe('¡Registro exitoso! Verifica tu correo electrónico para confirmar tu cuenta.');
+      expect(component.success()).toBe(
+        '¡Registro exitoso! Verifica tu correo electrónico para confirmar tu cuenta.',
+      );
     });
 
     it('should set loading to true during registration', async () => {
@@ -250,9 +252,7 @@ describe('RegisterComponent', () => {
 
     it('should show error message on registration failure', async () => {
       const errorMessage = 'Email already exists';
-      supabaseMock.signUp.and.returnValue(
-        Promise.reject(new Error(errorMessage))
-      );
+      supabaseMock.signUp.and.returnValue(Promise.reject(new Error(errorMessage)));
 
       await component.onSubmit();
 
@@ -260,9 +260,7 @@ describe('RegisterComponent', () => {
     });
 
     it('should show default error when error message is not available', async () => {
-      supabaseMock.signUp.and.returnValue(
-        Promise.reject({})
-      );
+      supabaseMock.signUp.and.returnValue(Promise.reject({}));
 
       await component.onSubmit();
 
@@ -270,9 +268,7 @@ describe('RegisterComponent', () => {
     });
 
     it('should not show success message on registration failure', async () => {
-      supabaseMock.signUp.and.returnValue(
-        Promise.reject(new Error('Registration failed'))
-      );
+      supabaseMock.signUp.and.returnValue(Promise.reject(new Error('Registration failed')));
 
       await component.onSubmit();
 
@@ -280,9 +276,7 @@ describe('RegisterComponent', () => {
     });
 
     it('should set loading to false after failed registration', async () => {
-      supabaseMock.signUp.and.returnValue(
-        Promise.reject(new Error('Registration failed'))
-      );
+      supabaseMock.signUp.and.returnValue(Promise.reject(new Error('Registration failed')));
 
       await component.onSubmit();
 
@@ -290,9 +284,7 @@ describe('RegisterComponent', () => {
     });
 
     it('should not navigate on registration failure', async () => {
-      supabaseMock.signUp.and.returnValue(
-        Promise.reject(new Error('Registration failed'))
-      );
+      supabaseMock.signUp.and.returnValue(Promise.reject(new Error('Registration failed')));
 
       await component.onSubmit();
 
@@ -302,7 +294,7 @@ describe('RegisterComponent', () => {
     it('should log error to console on registration failure', async () => {
       spyOn(console, 'error');
       const error = new Error('Network error');
-      
+
       supabaseMock.signUp.and.returnValue(Promise.reject(error));
 
       await component.onSubmit();

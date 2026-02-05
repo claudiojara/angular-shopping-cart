@@ -22,10 +22,10 @@ import { SupabaseService } from '../../services/supabase.service';
     MatInputModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    MatIconModule
+    MatIconModule,
   ],
   templateUrl: './register.html',
-  styleUrl: './register.scss'
+  styleUrl: './register.scss',
 })
 export class RegisterComponent {
   private supabase = inject(SupabaseService);
@@ -63,8 +63,10 @@ export class RegisterComponent {
 
     try {
       await this.supabase.signUp(this.email(), this.password());
-      this.success.set('¡Registro exitoso! Verifica tu correo electrónico para confirmar tu cuenta.');
-      
+      this.success.set(
+        '¡Registro exitoso! Verifica tu correo electrónico para confirmar tu cuenta.',
+      );
+
       // Auto login after 2 seconds
       setTimeout(async () => {
         try {

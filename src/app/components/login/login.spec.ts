@@ -19,8 +19,8 @@ describe('LoginComponent', () => {
       providers: [
         provideRouter([]),
         { provide: SupabaseService, useValue: supabaseMock },
-        { provide: Router, useValue: routerMock }
-      ]
+        { provide: Router, useValue: routerMock },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LoginComponent);
@@ -87,7 +87,7 @@ describe('LoginComponent', () => {
     it('should call signIn with correct credentials', async () => {
       const email = 'test@example.com';
       const password = 'password123';
-      
+
       component.email.set(email);
       component.password.set(password);
       supabaseMock.signIn.and.returnValue(Promise.resolve());
@@ -110,7 +110,7 @@ describe('LoginComponent', () => {
     it('should set loading to true during login', async () => {
       component.email.set('test@example.com');
       component.password.set('password123');
-      
+
       let loadingDuringCall = false;
       supabaseMock.signIn.and.callFake(async () => {
         loadingDuringCall = component.loading();
@@ -149,9 +149,7 @@ describe('LoginComponent', () => {
       const errorMessage = 'Invalid credentials';
       component.email.set('test@example.com');
       component.password.set('wrongpassword');
-      supabaseMock.signIn.and.returnValue(
-        Promise.reject(new Error(errorMessage))
-      );
+      supabaseMock.signIn.and.returnValue(Promise.reject(new Error(errorMessage)));
 
       await component.onSubmit();
 
@@ -161,9 +159,7 @@ describe('LoginComponent', () => {
     it('should show default error when error message is not available', async () => {
       component.email.set('test@example.com');
       component.password.set('wrongpassword');
-      supabaseMock.signIn.and.returnValue(
-        Promise.reject({})
-      );
+      supabaseMock.signIn.and.returnValue(Promise.reject({}));
 
       await component.onSubmit();
 
@@ -173,9 +169,7 @@ describe('LoginComponent', () => {
     it('should not navigate on login failure', async () => {
       component.email.set('test@example.com');
       component.password.set('wrongpassword');
-      supabaseMock.signIn.and.returnValue(
-        Promise.reject(new Error('Invalid credentials'))
-      );
+      supabaseMock.signIn.and.returnValue(Promise.reject(new Error('Invalid credentials')));
 
       await component.onSubmit();
 
@@ -185,9 +179,7 @@ describe('LoginComponent', () => {
     it('should set loading to false after failed login', async () => {
       component.email.set('test@example.com');
       component.password.set('wrongpassword');
-      supabaseMock.signIn.and.returnValue(
-        Promise.reject(new Error('Invalid credentials'))
-      );
+      supabaseMock.signIn.and.returnValue(Promise.reject(new Error('Invalid credentials')));
 
       await component.onSubmit();
 
@@ -197,7 +189,7 @@ describe('LoginComponent', () => {
     it('should log error to console on login failure', async () => {
       spyOn(console, 'error');
       const error = new Error('Network error');
-      
+
       component.email.set('test@example.com');
       component.password.set('password123');
       supabaseMock.signIn.and.returnValue(Promise.reject(error));

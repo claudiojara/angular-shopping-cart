@@ -18,7 +18,7 @@ describe('ProductList', () => {
       description: 'Description 1',
       price: 100,
       image: 'https://test.com/1.jpg',
-      category: 'Test'
+      category: 'Test',
     },
     {
       id: 2,
@@ -26,13 +26,13 @@ describe('ProductList', () => {
       description: 'Description 2',
       price: 200,
       image: 'https://test.com/2.jpg',
-      category: 'Test'
-    }
+      category: 'Test',
+    },
   ];
 
   beforeEach(async () => {
     productServiceMock = jasmine.createSpyObj('ProductService', ['getProductById'], {
-      getProducts: signal(mockProducts).asReadonly()
+      getProducts: signal(mockProducts).asReadonly(),
     });
 
     cartServiceMock = jasmine.createSpyObj('CartService', ['addToCart']);
@@ -41,8 +41,8 @@ describe('ProductList', () => {
       imports: [ProductList],
       providers: [
         { provide: ProductService, useValue: productServiceMock },
-        { provide: CartService, useValue: cartServiceMock }
-      ]
+        { provide: CartService, useValue: cartServiceMock },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProductList);
@@ -61,21 +61,21 @@ describe('ProductList', () => {
   it('should call cartService.addToCart when addToCart is called', () => {
     const product = mockProducts[0];
     component.addToCart(product);
-    
+
     expect(cartServiceMock.addToCart).toHaveBeenCalledWith(product);
   });
 
   it('should render product cards', () => {
     const compiled = fixture.nativeElement;
     const cards = compiled.querySelectorAll('mat-card');
-    
+
     expect(cards.length).toBe(mockProducts.length);
   });
 
   it('should display product names', () => {
     const compiled = fixture.nativeElement;
     const productTitles = compiled.querySelectorAll('mat-card-title');
-    
+
     expect(productTitles[0].textContent).toContain('Test Product 1');
     expect(productTitles[1].textContent).toContain('Test Product 2');
   });
@@ -83,7 +83,7 @@ describe('ProductList', () => {
   it('should have add to cart buttons', () => {
     const compiled = fixture.nativeElement;
     const buttons = compiled.querySelectorAll('button[data-testid*="add-to-cart"]');
-    
+
     expect(buttons.length).toBeGreaterThan(0);
   });
 });

@@ -20,7 +20,7 @@ import { CartService } from '../../services/cart.service';
     MatListModule,
     MatDividerModule,
     MatBadgeModule,
-    MatTooltipModule
+    MatTooltipModule,
   ],
   templateUrl: './cart.html',
   styleUrl: './cart.scss',
@@ -38,7 +38,7 @@ export class Cart {
 
   removeItem(productId: number): void {
     // Prevenir múltiples clicks
-    if (!this.items().find(item => item.product.id === productId)) {
+    if (!this.items().find((item) => item.product.id === productId)) {
       return;
     }
     this.cartService.removeFromCart(productId);

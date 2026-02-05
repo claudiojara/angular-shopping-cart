@@ -14,30 +14,28 @@ interface DbCartItem {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CartService {
   private supabase = inject(SupabaseService);
   private productService = inject(ProductService);
-  
+
   private cartItems = signal<CartItem[]>([]);
   private isLoading = signal<boolean>(false);
 
   // Computed signals para estado derivado
   items = this.cartItems.asReadonly();
   loading = this.isLoading.asReadonly();
-  
-  itemCount = computed(() => 
-    this.cartItems().reduce((total, item) => total + item.quantity, 0)
-  );
-  
-  total = computed(() => 
-    this.cartItems().reduce((sum, item) => sum + (item.product.price * item.quantity), 0)
+
+  itemCount = computed(() => this.cartItems().reduce((total, item) => total + item.quantity, 0));
+
+  total = computed(() =>
+    this.cartItems().reduce((sum, item) => sum + item.product.price * item.quantity, 0),
   );
 
   constructor() {
     // Subscribe to auth changes and load cart
-    this.supabase.currentUser$.subscribe(user => {
+    this.supabase.currentUser$.subscribe((user) => {
       if (user) {
         this.loadCartFromDb();
       } else {
@@ -60,19 +58,19 @@ export class CartService {
       const { data, error } = await this.supabase.client
         .from('cart_items')
         .select('*')
-        .eq('user_id', user.id)  // ✅ Filtrar por usuario actual
+        .eq('user_id', user.id) // ✅ Filtrar por usuario actual
         .order('created_at', { ascending: true });
 
       if (error) throw error;
 
       if (data) {
         const cartItems: CartItem[] = (data as DbCartItem[])
-          .map(dbItem => {
+          .map((dbItem) => {
             const product = this.productService.getProductById(dbItem.product_id);
             if (product) {
               return {
                 product,
-                quantity: dbItem.quantity
+                quantity: dbItem.quantity,
               };
             }
             return null;
@@ -90,32 +88,32 @@ export class CartService {
 
   async addToCart(product: Product): Promise<void> {
     const currentItems = this.cartItems();
-    const existingItem = currentItems.find(item => item.product.id === product.id);
+    const existingItem = currentItems.find((item) => item.product.id === product.id);
 
     if (existingItem) {
       await this.updateQuantity(product.id, existingItem.quantity + 1);
     } else {
       // Optimistic update
-      this.cartItems.update(items => [...items, { product, quantity: 1 }]);
+      this.cartItems.update((items) => [...items, { product, quantity: 1 }]);
 
       // Sync to DB if authenticated
       if (this.supabase.isAuthenticated()) {
         try {
           const user = this.supabase.getCurrentUser();
-          
+
           const { error, data } = await this.supabase.client
             .from('cart_items')
             .insert({
               user_id: user!.id,
               product_id: product.id,
-              quantity: 1
+              quantity: 1,
             })
             .select();
 
           if (error) {
             // Rollback on error
-            this.cartItems.update(items => 
-              items.filter(item => item.product.id !== product.id)
+            this.cartItems.update((items) =>
+              items.filter((item) => item.product.id !== product.id),
             );
             throw error;
           }
@@ -128,10 +126,8 @@ export class CartService {
 
   async removeFromCart(productId: number): Promise<void> {
     // Optimistic update
-    const removedItem = this.cartItems().find(item => item.product.id === productId);
-    this.cartItems.update(items => 
-      items.filter(item => item.product.id !== productId)
-    );
+    const removedItem = this.cartItems().find((item) => item.product.id === productId);
+    this.cartItems.update((items) => items.filter((item) => item.product.id !== productId));
 
     // Sync to DB if authenticated
     if (this.supabase.isAuthenticated()) {
@@ -143,12 +139,12 @@ export class CartService {
           .from('cart_items')
           .delete()
           .eq('product_id', productId)
-          .eq('user_id', user.id);  // ✅ Filtrar por usuario actual
+          .eq('user_id', user.id); // ✅ Filtrar por usuario actual
 
         if (error) {
           // Rollback on error
           if (removedItem) {
-            this.cartItems.update(items => [...items, removedItem]);
+            this.cartItems.update((items) => [...items, removedItem]);
           }
           throw error;
         }
@@ -165,13 +161,9 @@ export class CartService {
     }
 
     // Optimistic update
-    const oldQuantity = this.cartItems().find(item => item.product.id === productId)?.quantity;
-    this.cartItems.update(items =>
-      items.map(item =>
-        item.product.id === productId
-          ? { ...item, quantity }
-          : item
-      )
+    const oldQuantity = this.cartItems().find((item) => item.product.id === productId)?.quantity;
+    this.cartItems.update((items) =>
+      items.map((item) => (item.product.id === productId ? { ...item, quantity } : item)),
     );
 
     // Sync to DB if authenticated
@@ -184,17 +176,15 @@ export class CartService {
           .from('cart_items')
           .update({ quantity })
           .eq('product_id', productId)
-          .eq('user_id', user.id);  // ✅ Filtrar por usuario actual
+          .eq('user_id', user.id); // ✅ Filtrar por usuario actual
 
         if (error) {
           // Rollback on error
           if (oldQuantity !== undefined) {
-            this.cartItems.update(items =>
-              items.map(item =>
-                item.product.id === productId
-                  ? { ...item, quantity: oldQuantity }
-                  : item
-              )
+            this.cartItems.update((items) =>
+              items.map((item) =>
+                item.product.id === productId ? { ...item, quantity: oldQuantity } : item,
+              ),
             );
           }
           throw error;

@@ -16,15 +16,15 @@ describe('App', () => {
 
   beforeEach(async () => {
     currentUserSubject = new BehaviorSubject(null);
-    
+
     cartServiceMock = jasmine.createSpyObj('CartService', [], {
-      itemCount: signal(0)
+      itemCount: signal(0),
     });
-    
+
     supabaseMock = jasmine.createSpyObj('SupabaseService', ['signOut'], {
-      currentUser$: currentUserSubject.asObservable()
+      currentUser$: currentUserSubject.asObservable(),
     });
-    
+
     routerMock = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
@@ -33,8 +33,8 @@ describe('App', () => {
         provideRouter([]),
         { provide: CartService, useValue: cartServiceMock },
         { provide: SupabaseService, useValue: supabaseMock },
-        { provide: Router, useValue: routerMock }
-      ]
+        { provide: Router, useValue: routerMock },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(App);
@@ -73,33 +73,33 @@ describe('App', () => {
     it('should display cart item count from CartService', () => {
       // Update the mock signal
       Object.defineProperty(cartServiceMock, 'itemCount', {
-        get: () => signal(5)
+        get: () => signal(5),
       });
-      
+
       const newComponent = TestBed.createComponent(App).componentInstance;
-      
+
       expect(newComponent.cartItemCount()).toBe(5);
     });
 
     it('should show 0 items when cart is empty', () => {
       Object.defineProperty(cartServiceMock, 'itemCount', {
-        get: () => signal(0)
+        get: () => signal(0),
       });
-      
+
       const newComponent = TestBed.createComponent(App).componentInstance;
-      
+
       expect(newComponent.cartItemCount()).toBe(0);
     });
 
     it('should update when cart items change', () => {
       const itemCountSignal = signal(2);
       Object.defineProperty(cartServiceMock, 'itemCount', {
-        get: () => itemCountSignal.asReadonly()
+        get: () => itemCountSignal.asReadonly(),
       });
-      
+
       const newComponent = TestBed.createComponent(App).componentInstance;
       expect(newComponent.cartItemCount()).toBe(2);
-      
+
       itemCountSignal.set(5);
       expect(newComponent.cartItemCount()).toBe(5);
     });
@@ -108,36 +108,36 @@ describe('App', () => {
   describe('User Authentication State', () => {
     it('should show no user when not authenticated', (done) => {
       currentUserSubject.next(null);
-      
-      component.currentUser.subscribe(user => {
+
+      component.currentUser.subscribe((user) => {
         expect(user).toBeNull();
         done();
       });
     });
 
     it('should show user when authenticated', (done) => {
-      const mockUser = { 
-        id: '123', 
+      const mockUser = {
+        id: '123',
         email: 'test@example.com',
-        user_metadata: {}
+        user_metadata: {},
       };
       currentUserSubject.next(mockUser);
-      
-      component.currentUser.subscribe(user => {
+
+      component.currentUser.subscribe((user) => {
         expect(user).toEqual(mockUser);
         done();
       });
     });
 
     it('should update when authentication state changes', (done) => {
-      const mockUser = { 
-        id: '123', 
+      const mockUser = {
+        id: '123',
         email: 'test@example.com',
-        user_metadata: {}
+        user_metadata: {},
       };
-      
+
       let callCount = 0;
-      component.currentUser.subscribe(user => {
+      component.currentUser.subscribe((user) => {
         callCount++;
         if (callCount === 1) {
           expect(user).toBeNull();
@@ -168,9 +168,7 @@ describe('App', () => {
     });
 
     it('should navigate to login even if signOut takes time', async () => {
-      supabaseMock.signOut.and.returnValue(
-        new Promise(resolve => setTimeout(resolve, 100))
-      );
+      supabaseMock.signOut.and.returnValue(new Promise((resolve) => setTimeout(resolve, 100)));
 
       await component.logout();
 
@@ -189,9 +187,7 @@ describe('App', () => {
 
     it('should not navigate to login on logout error', async () => {
       spyOn(console, 'error');
-      supabaseMock.signOut.and.returnValue(
-        Promise.reject(new Error('Logout failed'))
-      );
+      supabaseMock.signOut.and.returnValue(Promise.reject(new Error('Logout failed')));
 
       await component.logout();
 
@@ -250,10 +246,10 @@ describe('App', () => {
 
   describe('User Menu', () => {
     it('should show user menu when authenticated', () => {
-      const mockUser = { 
-        id: '123', 
+      const mockUser = {
+        id: '123',
         email: 'test@example.com',
-        user_metadata: {}
+        user_metadata: {},
       };
       currentUserSubject.next(mockUser);
       fixture.detectChanges();
@@ -290,7 +286,7 @@ describe('App', () => {
       const logoutPromise = component.logout();
 
       expect(supabaseMock.signOut).toHaveBeenCalled();
-      
+
       await logoutPromise;
       expect(routerMock.navigate).toHaveBeenCalledWith(['/login']);
     });
@@ -300,9 +296,9 @@ describe('App', () => {
       const user2 = { id: '2', email: 'user2@example.com', user_metadata: {} };
 
       const receivedUsers: any[] = [];
-      component.currentUser.subscribe(user => {
+      component.currentUser.subscribe((user) => {
         receivedUsers.push(user);
-        
+
         if (receivedUsers.length === 4) {
           expect(receivedUsers[0]).toBeNull();
           expect(receivedUsers[1]).toEqual(user1);
@@ -320,11 +316,11 @@ describe('App', () => {
     it('should handle very large cart item counts', () => {
       const largeCount = signal(999);
       Object.defineProperty(cartServiceMock, 'itemCount', {
-        get: () => largeCount.asReadonly()
+        get: () => largeCount.asReadonly(),
       });
-      
+
       const newComponent = TestBed.createComponent(App).componentInstance;
-      
+
       expect(newComponent.cartItemCount()).toBe(999);
     });
   });

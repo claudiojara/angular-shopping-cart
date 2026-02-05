@@ -1,19 +1,40 @@
 <mat-toolbar color="primary" class="app-toolbar">
   <mat-toolbar-row>
-    <button mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" data-testid="navbar-home-button">
+    <button
+      mat-button
+      routerLink="/"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      data-testid="navbar-home-button"
+    >
       <mat-icon>store</mat-icon>
       <span>TiendApp</span>
     </button>
 
     <span class="spacer"></span>
 
-    <button mat-button routerLink="/products" routerLinkActive="active" data-testid="navbar-products-button">
+    <button
+      mat-button
+      routerLink="/products"
+      routerLinkActive="active"
+      data-testid="navbar-products-button"
+    >
       <mat-icon>inventory_2</mat-icon>
       <span>Productos</span>
     </button>
 
-    <button mat-button routerLink="/cart" routerLinkActive="active" data-testid="navbar-cart-button">
-      <mat-icon [matBadge]="cartItemCount()" [matBadgeHidden]="cartItemCount() === 0" matBadgeColor="accent" data-testid="cart-badge">
+    <button
+      mat-button
+      routerLink="/cart"
+      routerLinkActive="active"
+      data-testid="navbar-cart-button"
+    >
+      <mat-icon
+        [matBadge]="cartItemCount()"
+        [matBadgeHidden]="cartItemCount() === 0"
+        matBadgeColor="accent"
+        data-testid="cart-badge"
+      >
         shopping_cart
       </mat-icon>
       <span>Carrito</span>
@@ -34,7 +55,12 @@
         </button>
       </mat-menu>
     } @else {
-      <button mat-button routerLink="/login" routerLinkActive="active" data-testid="navbar-login-button">
+      <button
+        mat-button
+        routerLink="/login"
+        routerLinkActive="active"
+        data-testid="navbar-login-button"
+      >
         <mat-icon>login</mat-icon>
         <span>Iniciar Sesión</span>
       </button>
