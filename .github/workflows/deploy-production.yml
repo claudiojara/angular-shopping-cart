@@ -69,21 +69,19 @@ jobs:
       - name: Wait for deployment
         run: npx wait-on https://witty-bush-0d65a3d0f.2.azurestaticapps.net --timeout 120000
 
-      - name: Run E2E tests
-        run: npm run test:e2e:ci
+      - name: Run smoke tests
+        run: npm run test:e2e:smoke
         env:
-          PLAYWRIGHT_BASE_URL: https://witty-bush-0d65a3d0f.2.azurestaticapps.net
+          PLAYWRIGHT_TEST_BASE_URL: https://witty-bush-0d65a3d0f.2.azurestaticapps.net
           PLAYWRIGHT_TEST_EMAIL: ${{ secrets.PLAYWRIGHT_TEST_EMAIL }}
           PLAYWRIGHT_TEST_PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_PASSWORD }}
-          PLAYWRIGHT_TEST2_EMAIL: ${{ secrets.PLAYWRIGHT_TEST2_EMAIL }}
-          PLAYWRIGHT_TEST2_PASSWORD: ${{ secrets.PLAYWRIGHT_TEST2_PASSWORD }}
 
-      - name: Upload E2E test results
+      - name: Upload smoke test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-production
-          path: playwright-report/
+          name: playwright-smoke-report-production
+          path: playwright-report-ci/
           retention-days: 30
 
       - name: Create GitHub Release

@@ -37,7 +37,8 @@ ng test --browsers=ChromeHeadless            # Headless (CI)
 #### E2E Tests (Playwright)
 
 ```bash
-npm run test:e2e                             # Run E2E tests (headless)
+npm run test:e2e                             # Run all E2E tests (headless)
+npm run test:e2e:smoke                       # Run smoke tests only (CI/CD)
 npm run test:e2e:ui                          # Interactive UI mode
 npm run test:e2e:headed                      # Watch tests run in browser
 npm run test:e2e:report                      # View test results
@@ -62,10 +63,13 @@ Antes de ejecutar tests E2E, crear usuario de testing en Supabase:
 
 **Estructura de tests:**
 
-- `e2e/authentication.spec.ts` - TC001-TC005 (Login/Register/Logout)
-- `e2e/shopping-cart.spec.ts` - TC006-TC015 (Productos/Carrito/Navegación)
+- `e2e/smoke.spec.ts` - **Smoke tests (CI/CD)** - 2 tests críticos para validación rápida
+- `e2e/authentication.spec.ts` - TC001-TC005 (Login/Register/Logout) - 5 tests
+- `e2e/shopping-cart.spec.ts` - TC006-TC015 (Productos/Carrito/Navegación) - 10 tests
 - `e2e/pages/*.page.ts` - Page Object Models con selectores `data-testid`
-- `e2e/config/test-credentials.ts` - Credenciales centralizadas
+- `e2e/config/test-users.ts` - Credenciales centralizadas
+- `playwright.config.ts` - Configuración principal (todos los tests)
+- `playwright.ci.config.ts` - Configuración CI/CD (solo smoke tests)
 
 ## File Naming
 

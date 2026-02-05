@@ -11,6 +11,7 @@
     "test:ci": "ng test --no-watch --code-coverage --browsers=ChromeHeadlessCI",
     "test:e2e": "playwright test",
     "test:e2e:ci": "playwright test --workers=1",
+    "test:e2e:smoke": "playwright test --config=playwright.ci.config.ts",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:report": "playwright show-report",
