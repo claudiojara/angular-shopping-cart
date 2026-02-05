@@ -85,3 +85,19 @@ jobs:
           name: playwright-smoke-report-staging
           path: playwright-report-ci/
           retention-days: 30
+
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.13.x
+          lhci autorun
+        env:
+          CI: true
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Upload Lighthouse results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-results-staging
+          path: .lighthouseci/
+          retention-days: 30
