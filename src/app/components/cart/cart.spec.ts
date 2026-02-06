@@ -14,12 +14,17 @@ xdescribe('Cart', () => {
   const mockProduct: Product = {
     id: 1,
     name: 'Test Product',
+    slug: 'test-product',
     description: 'Test Description',
     price: 99.99,
     image: 'https://test.com/image.jpg',
     category: 'Test',
     rating: 5.0,
     reviewCount: 10,
+    sku: 'TEST-001',
+    stockQuantity: 10,
+    isAvailable: true,
+    isFeatured: false,
   };
 
   const mockCartItems: CartItem[] = [{ product: mockProduct, quantity: 2 }];

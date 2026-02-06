@@ -1,12 +1,41 @@
 import { TestBed } from '@angular/core/testing';
 import { ProductService } from './product.service';
+import { SupabaseService } from './supabase.service';
+import { provideConfigMock } from '../testing/test-helpers';
 
 describe('ProductService', () => {
   let service: ProductService;
+  let supabaseMock: jasmine.SpyObj<SupabaseService>;
 
   beforeEach(() => {
+    // Create a chainable query builder mock
+    const createQueryBuilderChain = () => {
+      const chain: any = {
+        select: jasmine.createSpy('select'),
+        eq: jasmine.createSpy('eq'),
+        order: jasmine.createSpy('order'),
+      };
+
+      chain.select.and.returnValue(chain);
+      chain.eq.and.returnValue(chain);
+      chain.order.and.returnValue(Promise.resolve({ data: [], error: null }));
+
+      return chain;
+    };
+
+    const supabaseClientMock = jasmine.createSpyObj('SupabaseClient', ['from']);
+    supabaseClientMock.from.and.callFake(() => createQueryBuilderChain());
+
+    supabaseMock = jasmine.createSpyObj('SupabaseService', ['getCurrentUser'], {
+      client: supabaseClientMock,
+    });
+
     TestBed.configureTestingModule({
-      providers: [ProductService],
+      providers: [
+        provideConfigMock(),
+        ProductService,
+        { provide: SupabaseService, useValue: supabaseMock },
+      ],
     });
     service = TestBed.inject(ProductService);
   });
@@ -15,44 +44,21 @@ describe('ProductService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should return all products', () => {
-    const products = service.getProducts;
-    expect(products().length).toBe(6);
+  it('should initialize with empty products', () => {
+    expect(service.products()).toEqual([]);
   });
 
-  it('should return product by id', () => {
-    const product = service.getProductById(1);
-    expect(product).toBeTruthy();
-    expect(product?.id).toBe(1);
-    expect(product?.name).toBe('Laptop Premium');
+  it('should have loading signal', async () => {
+    // Wait for initial load to complete
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(service.loading()).toBe(false);
   });
 
-  it('should return undefined for non-existent product', () => {
-    const product = service.getProductById(999);
-    expect(product).toBeUndefined();
+  it('should have error signal', () => {
+    expect(service.error()).toBeNull();
   });
 
-  it('should have all required product properties', () => {
-    const products = service.getProducts;
-    products().forEach((product: any) => {
-      expect(product.id).toBeDefined();
-      expect(product.name).toBeDefined();
-      expect(product.description).toBeDefined();
-      expect(product.price).toBeGreaterThan(0);
-      expect(product.image).toBeDefined();
-      expect(product.category).toBeDefined();
-    });
-  });
-
-  it('should have products in correct categories', () => {
-    const products = service.getProducts;
-    const categories = products().map((p: any) => p.category);
-
-    expect(categories).toContain('Electrónica');
-    expect(categories).toContain('Audio');
-    expect(categories).toContain('Móviles');
-    expect(categories).toContain('Diseño');
-    expect(categories).toContain('Wearables');
-    expect(categories).toContain('Fotografía');
+  it('should compute categories from products', () => {
+    expect(service.categories()).toEqual([]);
   });
 });

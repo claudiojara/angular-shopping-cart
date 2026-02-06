@@ -14,12 +14,17 @@ describe('CartService', () => {
   const mockProduct: Product = {
     id: 1,
     name: 'Test Product',
+    slug: 'test-product',
     description: 'Test Description',
     price: 99.99,
     image: 'https://test.com/image.jpg',
     category: 'Test',
     rating: 4.0,
     reviewCount: 3,
+    sku: 'TEST-001',
+    stockQuantity: 10,
+    isAvailable: true,
+    isFeatured: false,
   };
 
   const mockDbCartItems = [

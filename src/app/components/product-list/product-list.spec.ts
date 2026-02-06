@@ -16,29 +16,49 @@ xdescribe('ProductList', () => {
     {
       id: 1,
       name: 'Test Product 1',
+      slug: 'test-product-1',
       description: 'Description 1',
       price: 100,
       image: 'https://test.com/1.jpg',
       category: 'Test',
       rating: 4.5,
       reviewCount: 5,
+      sku: 'TEST-001',
+      stockQuantity: 10,
+      isAvailable: true,
+      isFeatured: false,
     },
     {
       id: 2,
       name: 'Test Product 2',
+      slug: 'test-product-2',
       description: 'Description 2',
       price: 200,
       image: 'https://test.com/2.jpg',
       category: 'Test',
       rating: 5.0,
       reviewCount: 8,
+      sku: 'TEST-002',
+      stockQuantity: 5,
+      isAvailable: true,
+      isFeatured: true,
     },
   ];
 
   beforeEach(async () => {
-    productServiceMock = jasmine.createSpyObj('ProductService', ['getProductById'], {
-      getProducts: signal(mockProducts).asReadonly(),
-    });
+    const productsSignal = signal(mockProducts);
+    const loadingSignal = signal(false);
+    const errorSignal = signal<string | null>(null);
+
+    productServiceMock = jasmine.createSpyObj(
+      'ProductService',
+      ['loadProducts', 'getProductBySlug'],
+      {
+        products: productsSignal.asReadonly(),
+        loading: loadingSignal.asReadonly(),
+        error: errorSignal.asReadonly(),
+      },
+    );
 
     cartServiceMock = jasmine.createSpyObj('CartService', ['addToCart']);
 
@@ -61,7 +81,7 @@ xdescribe('ProductList', () => {
   });
 
   it('should display products from service', () => {
-    expect(component.products()).toEqual(mockProducts);
+    expect(component.productService.products()).toEqual(mockProducts);
   });
 
   it('should call cartService.addToCart when addToCart is called', () => {
