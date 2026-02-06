@@ -20,7 +20,7 @@ const TEST_USERS = {
 };
 
 const SUPABASE_URL = 'https://owewtzddyykyraxkkorx.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_XbmBRik7ryFTq_-LJ2NLRw_3RaJGDz4';
+const SUPABASE_ANON_KEY = 'sb_publishable_EMV7TVY9I85fSZndebqPRA_rFti1dM7';
 
 async function setupTestUsers() {
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

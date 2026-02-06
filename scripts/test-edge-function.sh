@@ -8,7 +8,7 @@ echo ""
 
 # Configuration
 SUPABASE_URL="https://owewtzddyykyraxkkorx.supabase.co"
-ANON_KEY="sb_publishable_XbmBRik7ryFTq_-LJ2NLRw_3RaJGDz4"
+ANON_KEY="sb_publishable_EMV7TVY9I85fSZndebqPRA_rFti1dM7"
 
 echo "📋 Please provide your access token from the browser:"
 echo "   1. Open DevTools (F12)"

@@ -62,7 +62,7 @@ export class ConfigService {
         production: false,
         supabase: {
           url: 'https://owewtzddyykyraxkkorx.supabase.co',
-          anonKey: 'sb_publishable_XbmBRik7ryFTq_-LJ2NLRw_3RaJGDz4',
+          anonKey: 'sb_publishable_EMV7TVY9I85fSZndebqPRA_rFti1dM7',
         },
         environment: 'local',
         features: {

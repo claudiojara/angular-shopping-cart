@@ -143,7 +143,8 @@ serve(async (req) => {
 
     // Create Supabase admin client (bypasses ALL JWT validation)
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    const serviceRoleKey =
+      Deno.env.get('SERVICE_ROLE_KEY') ?? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
     console.log('🔐 Admin client created');
