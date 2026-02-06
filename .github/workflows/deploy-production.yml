@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
   deploy-production:
     name: Deploy to Azure Static Web Apps (Production)
