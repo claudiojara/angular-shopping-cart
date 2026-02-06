@@ -32,11 +32,39 @@
             <mat-icon>filter_list</mat-icon>
             Filtrar Productos
           </h2>
-          @if (selectedCategory() || priceRange().min > 0 || priceRange().max < 50000) {
+          @if (
+            selectedCategory() || priceRange().min > 0 || priceRange().max < 50000 || searchQuery()
+          ) {
             <button mat-button color="accent" (click)="clearFilters()" class="clear-filters-btn">
               Limpiar
             </button>
           }
+        </div>
+
+        <!-- Search Box -->
+        <div class="filter-section search-section">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar productos</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="Ej: Velora, lámpara, mesa..."
+              [(ngModel)]="searchQuery"
+              (ngModelChange)="onSearchChange()"
+              data-testid="product-search-input"
+            />
+            <mat-icon matPrefix>search</mat-icon>
+            @if (searchQuery()) {
+              <button
+                matSuffix
+                mat-icon-button
+                aria-label="Limpiar búsqueda"
+                (click)="searchQuery.set(''); onSearchChange()"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+          </mat-form-field>
         </div>
 
         <!-- Categories -->
@@ -151,15 +179,31 @@
 
           <!-- Product Grid -->
           <div class="product-grid" data-testid="product-grid">
-            @for (product of filteredProducts(); track product.id) {
-              <mat-card class="product-card" [attr.data-testid]="'product-card-' + product.id">
-                <!-- Badge -->
-                @if (product.badge) {
-                  <span class="product-badge">{{ product.badge }}</span>
-                }
+            @for (product of products(); track product.id) {
+              <mat-card
+                class="product-card"
+                [attr.data-testid]="'product-card-' + product.id"
+                [class.in-cart]="isInCart(product.id)"
+              >
+                <!-- Badges -->
+                <div class="card-badges">
+                  @if (product.badge) {
+                    <span class="product-badge">{{ product.badge }}</span>
+                  }
+                  @if (isInCart(product.id)) {
+                    <span class="in-cart-badge">
+                      <mat-icon>shopping_cart</mat-icon>
+                      En el carrito ({{ getCartQuantity(product.id) }})
+                    </span>
+                  }
+                </div>
 
-                <!-- Image -->
-                <div class="product-image-wrapper">
+                <!-- Image (clickable to open detail) -->
+                <div
+                  class="product-image-wrapper"
+                  (click)="openProductDetail(product)"
+                  style="cursor: pointer"
+                >
                   <img
                     [src]="product.image | optimizedImage: 400"
                     [srcset]="product.image | srcSet"
@@ -176,7 +220,11 @@
                 </div>
 
                 <!-- Content -->
-                <mat-card-content class="product-content">
+                <mat-card-content
+                  class="product-content"
+                  (click)="openProductDetail(product)"
+                  style="cursor: pointer"
+                >
                   <!-- Rating -->
                   <div class="product-rating">
                     <div class="stars">
@@ -229,21 +277,82 @@
 
                 <!-- Actions -->
                 <mat-card-actions class="product-actions">
-                  <button
-                    mat-raised-button
-                    color="primary"
-                    (click)="addToCart(product)"
-                    class="add-to-cart-btn"
-                    [attr.data-testid]="'add-to-cart-' + product.id"
-                    [matTooltip]="'Agregar ' + product.name + ' al carrito'"
-                  >
-                    <mat-icon>add_shopping_cart</mat-icon>
-                    Agregar al Carrito
-                  </button>
+                  @if (!isInCart(product.id)) {
+                    <button
+                      mat-raised-button
+                      color="primary"
+                      (click)="addToCart(product); $event.stopPropagation()"
+                      class="add-to-cart-btn"
+                      [attr.data-testid]="'add-to-cart-' + product.id"
+                      [matTooltip]="'Agregar ' + product.name + ' al carrito'"
+                    >
+                      <mat-icon>add_shopping_cart</mat-icon>
+                      Agregar al Carrito
+                    </button>
+                  } @else {
+                    <button
+                      mat-raised-button
+                      color="accent"
+                      (click)="goToCart(); $event.stopPropagation()"
+                      class="view-cart-btn"
+                      [attr.data-testid]="'view-cart-' + product.id"
+                    >
+                      <mat-icon>shopping_cart</mat-icon>
+                      Ver Carrito
+                    </button>
+                  }
                 </mat-card-actions>
               </mat-card>
             }
           </div>
+
+          <!-- Pagination Controls -->
+          @if (totalPages() > 1) {
+            <div class="pagination-controls">
+              <button
+                mat-button
+                [disabled]="!hasPreviousPage()"
+                (click)="loadPreviousPage()"
+                class="pagination-btn"
+                data-testid="pagination-previous"
+              >
+                <mat-icon>chevron_left</mat-icon>
+                Anterior
+              </button>
+
+              <span class="page-info" data-testid="pagination-info">
+                Página {{ currentPage() + 1 }} de {{ totalPages() }}
+                <span class="total-count">({{ totalCount() }} productos)</span>
+              </span>
+
+              <button
+                mat-button
+                [disabled]="!hasNextPage()"
+                (click)="loadNextPage()"
+                class="pagination-btn"
+                data-testid="pagination-next"
+              >
+                Siguiente
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+            </div>
+
+            <!-- Page Size Selector -->
+            <div class="page-size-selector">
+              <mat-form-field appearance="outline">
+                <mat-label>Productos por página</mat-label>
+                <mat-select
+                  [value]="pageSize()"
+                  (selectionChange)="changePageSize($event.value)"
+                  data-testid="page-size-select"
+                >
+                  <mat-option [value]="6">6</mat-option>
+                  <mat-option [value]="12">12</mat-option>
+                  <mat-option [value]="24">24</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          }
         }
         <!-- End of @else block for loaded products -->
       </main>

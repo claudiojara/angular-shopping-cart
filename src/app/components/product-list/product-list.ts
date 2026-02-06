@@ -18,6 +18,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
@@ -26,6 +27,7 @@ import { SeoService } from '../../services/seo.service';
 import { OptimizedImagePipe } from '../../pipes/optimized-image.pipe';
 import { SrcSetPipe } from '../../pipes/srcset.pipe';
 import { Product } from '../../models/product.model';
+import { ProductDetailModal } from '../product-detail-modal/product-detail-modal';
 
 type SortOption = 'featured' | 'price-asc' | 'price-desc' | 'rating';
 
@@ -50,6 +52,7 @@ type SortOption = 'featured' | 'price-asc' | 'price-desc' | 'rating';
     MatExpansionModule,
     MatSliderModule,
     MatBadgeModule,
+    MatDialogModule,
     OptimizedImagePipe,
     SrcSetPipe,
   ],
@@ -62,17 +65,28 @@ export class ProductList implements OnInit {
   private seoService = inject(SeoService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
 
   // State signals
   selectedCategory = signal<string>('');
   sortBy = signal<SortOption>('featured');
   priceRange = signal<{ min: number; max: number }>({ min: 0, max: 50000 });
+  searchQuery = signal<string>('');
+  showInStockOnly = signal<boolean>(false);
 
-  // Data from service
+  // Data from service (using database filtering)
   products = this.productService.products;
   categories = this.productService.categories;
   loading = this.productService.loading;
   error = this.productService.error;
+
+  // Pagination signals from service
+  totalCount = this.productService.totalCount;
+  currentPage = this.productService.currentPage;
+  pageSize = this.productService.pageSize;
+  totalPages = this.productService.totalPages;
+  hasNextPage = this.productService.hasNextPage;
+  hasPreviousPage = this.productService.hasPreviousPage;
 
   constructor() {
     // Set SEO for products page
@@ -84,9 +98,9 @@ export class ProductList implements OnInit {
     });
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     // Read query params and apply category filter
-    this.route.queryParams.subscribe((params) => {
+    this.route.queryParams.subscribe(async (params) => {
       const category = params['category'];
       if (category) {
         this.selectedCategory.set(category);
@@ -94,43 +108,37 @@ export class ProductList implements OnInit {
         // Clear category filter when no category in query params
         this.selectedCategory.set('');
       }
+      // Apply filters with database query
+      await this.applyFilters();
     });
   }
 
-  // Computed filtered products
-  filteredProducts = computed(() => {
-    let result = this.products();
+  /**
+   * Apply filters using database-level filtering (server-side)
+   * This replaces the old client-side computed filtering
+   */
+  async applyFilters(): Promise<void> {
+    const filters = {
+      category: this.selectedCategory() || undefined,
+      minPrice: this.priceRange().min,
+      maxPrice: this.priceRange().max,
+      searchQuery: this.searchQuery() || undefined,
+      inStock: this.showInStockOnly() || undefined,
+    };
 
-    // Filter by category
-    const category = this.selectedCategory();
-    if (category) {
-      result = result.filter((p) => p.category === category);
-    }
+    const pagination = {
+      page: 0, // Reset to first page when filters change
+      pageSize: 12,
+    };
 
-    // Filter by price range
-    const { min, max } = this.priceRange();
-    result = result.filter((p) => p.price >= min && p.price <= max);
+    await this.productService.loadProducts(filters, pagination);
+  }
 
-    // Sort
-    const sort = this.sortBy();
-    result = [...result].sort((a, b) => {
-      switch (sort) {
-        case 'price-asc':
-          return a.price - b.price;
-        case 'price-desc':
-          return b.price - a.price;
-        case 'rating':
-          return b.rating - a.rating;
-        default:
-          return a.id - b.id;
-      }
-    });
+  // Computed values (now using totalCount from database)
+  productCount = computed(() => this.totalCount());
 
-    return result;
-  });
-
-  // Computed values
-  productCount = computed(() => this.filteredProducts().length);
+  // Cart items for checking if product is in cart
+  cartItems = this.cartService.items;
 
   getStarsArray(rating: number): number[] {
     return Array(5)
@@ -138,8 +146,40 @@ export class ProductList implements OnInit {
       .map((_, i) => i + 1);
   }
 
+  /**
+   * Check if a product is in the cart
+   */
+  isInCart(productId: number): boolean {
+    return this.cartItems().some((item) => item.product.id === productId);
+  }
+
+  /**
+   * Get quantity of product in cart
+   */
+  getCartQuantity(productId: number): number {
+    const item = this.cartItems().find((item) => item.product.id === productId);
+    return item?.quantity ?? 0;
+  }
+
+  /**
+   * Open product detail modal
+   */
+  openProductDetail(product: Product): void {
+    this.dialog.open(ProductDetailModal, {
+      data: { product },
+      width: '1000px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'product-detail-dialog',
+    });
+  }
+
   addToCart(product: Product): void {
     this.cartService.addToCart(product);
+  }
+
+  goToCart(): void {
+    this.router.navigate(['/cart']);
   }
 
   formatPrice(price: number): string {
@@ -149,7 +189,7 @@ export class ProductList implements OnInit {
     return `$${formatted}`;
   }
 
-  setCategory(category: string): void {
+  async setCategory(category: string): Promise<void> {
     this.selectedCategory.set(category);
     // Update URL to reflect selected category
     if (category) {
@@ -165,25 +205,53 @@ export class ProductList implements OnInit {
         queryParamsHandling: 'merge',
       });
     }
+    await this.applyFilters();
   }
 
-  updatePriceMin(value: number): void {
+  async updatePriceMin(value: number): Promise<void> {
     this.priceRange.update((range) => ({ ...range, min: value }));
+    await this.applyFilters();
   }
 
-  updatePriceMax(value: number): void {
+  async updatePriceMax(value: number): Promise<void> {
     this.priceRange.update((range) => ({ ...range, max: value }));
+    await this.applyFilters();
   }
 
-  clearFilters(): void {
+  async onSearchChange(): Promise<void> {
+    await this.applyFilters();
+  }
+
+  async toggleInStockOnly(): Promise<void> {
+    this.showInStockOnly.update((value) => !value);
+    await this.applyFilters();
+  }
+
+  async clearFilters(): Promise<void> {
     this.selectedCategory.set('');
     this.priceRange.set({ min: 0, max: 50000 });
     this.sortBy.set('featured');
+    this.searchQuery.set('');
+    this.showInStockOnly.set(false);
     // Clear URL query params
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {},
     });
+    await this.applyFilters();
+  }
+
+  // Pagination methods
+  async loadNextPage(): Promise<void> {
+    await this.productService.loadNextPage();
+  }
+
+  async loadPreviousPage(): Promise<void> {
+    await this.productService.loadPreviousPage();
+  }
+
+  async changePageSize(size: number): Promise<void> {
+    await this.productService.setPageSize(size);
   }
 
   /**
@@ -191,6 +259,6 @@ export class ProductList implements OnInit {
    * Útil para desarrollo/debugging cuando cambias datos en Supabase
    */
   async refreshProducts(): Promise<void> {
-    await this.productService.loadProducts();
+    await this.applyFilters();
   }
 }
