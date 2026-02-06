@@ -8,23 +8,25 @@
       <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Correo Electrónico</mat-label>
-          <input 
-            matInput 
-            type="email" 
+          <input
+            matInput
+            type="email"
             [ngModel]="email()"
             (ngModelChange)="email.set($event)"
             name="email"
             required
             email
             [disabled]="loading()"
-            autocomplete="email">
+            autocomplete="email"
+            data-testid="register-email-input"
+          />
           <mat-icon matPrefix>email</mat-icon>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Contraseña</mat-label>
-          <input 
-            matInput 
+          <input
+            matInput
             [type]="hidePassword() ? 'password' : 'text'"
             [ngModel]="password()"
             (ngModelChange)="password.set($event)"
@@ -32,61 +34,71 @@
             required
             minlength="6"
             [disabled]="loading()"
-            autocomplete="new-password">
+            autocomplete="new-password"
+            data-testid="register-password-input"
+          />
           <mat-icon matPrefix>lock</mat-icon>
-          <button 
-            mat-icon-button 
-            matSuffix 
+          <button
+            mat-icon-button
+            matSuffix
             type="button"
             (click)="togglePasswordVisibility()"
-            [disabled]="loading()">
-            <mat-icon>{{hidePassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
+            [disabled]="loading()"
+            data-testid="register-toggle-password"
+          >
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
           <mat-hint>Mínimo 6 caracteres</mat-hint>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Confirmar Contraseña</mat-label>
-          <input 
-            matInput 
+          <input
+            matInput
             [type]="hideConfirmPassword() ? 'password' : 'text'"
             [ngModel]="confirmPassword()"
             (ngModelChange)="confirmPassword.set($event)"
             name="confirmPassword"
             required
             [disabled]="loading()"
-            autocomplete="new-password">
+            autocomplete="new-password"
+            data-testid="register-confirm-password-input"
+          />
           <mat-icon matPrefix>lock</mat-icon>
-          <button 
-            mat-icon-button 
-            matSuffix 
+          <button
+            mat-icon-button
+            matSuffix
             type="button"
             (click)="toggleConfirmPasswordVisibility()"
-            [disabled]="loading()">
-            <mat-icon>{{hideConfirmPassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
+            [disabled]="loading()"
+            data-testid="register-toggle-confirm-password"
+          >
+            <mat-icon>{{ hideConfirmPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
         </mat-form-field>
 
         @if (error()) {
-          <div class="error-message">
+          <div class="error-message" data-testid="register-error-message">
             <mat-icon>error</mat-icon>
             <span>{{ error() }}</span>
           </div>
         }
 
         @if (success()) {
-          <div class="success-message">
+          <div class="success-message" data-testid="register-success-message">
             <mat-icon>check_circle</mat-icon>
             <span>{{ success() }}</span>
           </div>
         }
 
-        <button 
-          mat-raised-button 
-          color="primary" 
+        <button
+          mat-raised-button
+          color="primary"
           type="submit"
           class="full-width submit-button"
-          [disabled]="loading() || !registerForm.form.valid">
+          [disabled]="loading() || !registerForm.form.valid"
+          data-testid="register-submit-button"
+        >
           @if (loading()) {
             <mat-spinner diameter="20"></mat-spinner>
           } @else {

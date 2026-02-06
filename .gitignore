@@ -38,6 +38,22 @@ testem.log
 /typings
 __screenshots__/
 
+# Testing
+# Playwright
+/test-results/
+/playwright-report/
+/playwright-report-ci/
+/playwright/.cache/
+
+# TestSprite
+/.testsprite/
+/testsprite-report/
+
+# Runtime configuration (local overrides with real credentials)
+/src/assets/config.local.json
+/public/config.local.json
+
 # System files
 .DS_Store
 Thumbs.db
+.session-state.json

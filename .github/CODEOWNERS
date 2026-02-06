@@ -1,0 +1,54 @@
+# Code Owners for Angular Shopping Cart
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global fallback - todos los archivos requieren review de @claudiojara
+*       @claudiojara
+
+# Core Application Services
+# Cambios críticos que afectan la lógica de negocio
+/src/app/services/cart.service.ts           @claudiojara
+/src/app/services/product.service.ts        @claudiojara
+/src/app/services/supabase.service.ts       @claudiojara
+
+# Configuration & Core
+# Sistema de configuración runtime y servicios core
+/src/app/core/                              @claudiojara
+/src/assets/config.json                     @claudiojara
+/src/assets/config.local.json.template      @claudiojara
+
+# CI/CD Workflows
+# Cambios en pipelines de CI/CD requieren revisión cuidadosa
+/.github/workflows/                         @claudiojara
+/scripts/                                   @claudiojara
+/.azure/                                    @claudiojara
+
+# Quality Configuration
+# Linting, testing, y herramientas de calidad
+/karma.conf.js                              @claudiojara
+/eslint.config.js                           @claudiojara
+/.prettierrc.json                           @claudiojara
+/codecov.yml                                @claudiojara
+/playwright.config.ts                       @claudiojara
+
+# E2E Tests
+# Tests críticos que verifican funcionalidad completa
+/e2e/                                       @claudiojara
+
+# Documentation
+# Asegurar que la documentación se mantenga actualizada
+*.md                                        @claudiojara
+/docs/                                      @claudiojara
+
+# Package Management
+# Cambios en dependencias deben ser revisados
+/package.json                               @claudiojara
+/package-lock.json                          @claudiojara
+
+# Build Configuration
+# Configuración de Angular CLI y build process
+/angular.json                               @claudiojara
+/tsconfig*.json                             @claudiojara
+
+# Root Configuration Files
+/.gitignore                                 @claudiojara
+/.nvmrc                                     @claudiojara

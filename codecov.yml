@@ -1,0 +1,33 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 60%
+        threshold: 2%
+        if_ci_failed: error
+    patch:
+      default:
+        target: 50%
+        threshold: 5%
+        if_ci_failed: ignore
+
+ignore:
+  - "**/*.spec.ts"
+  - "**/*.mock.ts"
+  - "**/test-*.ts"
+  - "e2e/**/*"
+  - "src/environments/**"
+  - "scripts/**"
+
+comment:
+  layout: "reach,diff,flags,tree,files"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true
+
+flags:
+  unittests:
+    paths:
+      - src/
+    carryforward: true

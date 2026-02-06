@@ -1,0 +1,192 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  # Job 1: Quality checks (parallelized)
+  quality-checks:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      # Optimización #1: Caché mejorado de npm
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Prettier check
+        run: npm run format:check
+
+      - name: Run ESLint
+        run: npm run lint
+
+  # Job 2: Build and deploy (waits for quality checks to pass)
+  build-and-deploy:
+    name: Build & Deploy to Staging
+    needs: quality-checks # Optimización #6: Wait for quality checks before deploying
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://agreeable-sand-011792d0f.6.azurestaticapps.net
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      # Optimización #1: Caché mejorado de npm
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Optimización #4: Caché de build de Angular
+      - name: Cache Angular build
+        uses: actions/cache@v4
+        with:
+          path: |
+            .angular/cache
+            dist
+          key: ${{ runner.os }}-angular-build-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('src/**/*.ts', 'src/**/*.html', 'src/**/*.scss') }}
+          restore-keys: |
+            ${{ runner.os }}-angular-build-${{ hashFiles('**/package-lock.json') }}-
+            ${{ runner.os }}-angular-build-
+
+      # Optimización #4: Caché de build de Angular
+      - name: Cache Angular build
+        uses: actions/cache@v4
+        with:
+          path: |
+            .angular/cache
+            dist
+          key: ${{ runner.os }}-angular-build-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('src/**/*.ts', 'src/**/*.html', 'src/**/*.scss') }}
+          restore-keys: |
+            ${{ runner.os }}-angular-build-${{ hashFiles('**/package-lock.json') }}-
+            ${{ runner.os }}-angular-build-
+
+      - name: Build application
+        run: npm run build:prod
+
+      - name: Analyze bundle size
+        run: npm run analyze:size
+
+      - name: Generate runtime config
+        run: bash scripts/generate-config.sh
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
+      - name: Deploy to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_STAGING }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: 'upload'
+          app_location: 'dist/shopping-cart/browser'
+          skip_app_build: true
+
+  # Job 3: E2E smoke tests (waits for deployment)
+  smoke-tests:
+    name: Smoke Tests
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Optimización #3: Solo instalar Chromium
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Wait for deployment
+        run: npx wait-on https://agreeable-sand-011792d0f.6.azurestaticapps.net --timeout 120000
+
+      - name: Run smoke tests
+        run: npm run test:e2e:smoke
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: https://agreeable-sand-011792d0f.6.azurestaticapps.net
+          PLAYWRIGHT_TEST_EMAIL: ${{ secrets.PLAYWRIGHT_TEST_EMAIL }}
+          PLAYWRIGHT_TEST_PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_PASSWORD }}
+
+      - name: Upload smoke test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-smoke-report-staging
+          path: playwright-report-ci/
+          retention-days: 30
+
+  # Job 4: Lighthouse performance audit (runs in parallel with smoke tests)
+  lighthouse:
+    name: Lighthouse Performance Audit
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.13.x
+
+      - name: Wait for deployment
+        run: npx wait-on https://agreeable-sand-011792d0f.6.azurestaticapps.net --timeout 120000
+
+      - name: Run Lighthouse CI
+        run: lhci autorun
+        env:
+          CI: true
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Upload Lighthouse results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-results-staging
+          path: .lighthouseci/
+          retention-days: 30

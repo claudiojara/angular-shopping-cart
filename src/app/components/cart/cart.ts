@@ -1,5 +1,6 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,19 +9,24 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CartService } from '../../services/cart.service';
+import { OptimizedImagePipe } from '../../pipes/optimized-image.pipe';
+import { ClpCurrencyPipe } from '../../pipes/clp-currency.pipe';
 
 @Component({
   selector: 'app-cart',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
+    RouterModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
     MatListModule,
     MatDividerModule,
     MatBadgeModule,
-    MatTooltipModule
+    MatTooltipModule,
+    OptimizedImagePipe,
+    ClpCurrencyPipe,
   ],
   templateUrl: './cart.html',
   styleUrl: './cart.scss',
@@ -38,7 +44,7 @@ export class Cart {
 
   removeItem(productId: number): void {
     // Prevenir múltiples clicks
-    if (!this.items().find(item => item.product.id === productId)) {
+    if (!this.items().find((item) => item.product.id === productId)) {
       return;
     }
     this.cartService.removeFromCart(productId);
@@ -49,7 +55,10 @@ export class Cart {
   }
 
   checkout(): void {
-    alert('¡Gracias por tu compra! Total: ' + this.total().toFixed(2));
+    const formattedTotal = Math.round(this.total())
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    alert('¡Gracias por tu compra! Total: $' + formattedTotal);
     this.clearCart();
   }
 }

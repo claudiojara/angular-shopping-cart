@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50">
+  <!-- Texto Forja del Destino -->
+  <text x="10" y="35" font-family="Cinzel, serif" font-size="20" font-weight="600" fill="#373737">
+    Forja del Destino
+  </text>
+  <!-- Línea decorativa dorada -->
+  <rect x="10" y="38" width="180" height="2" fill="#a98a51"/>
+</svg>

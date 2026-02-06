@@ -1,0 +1,12 @@
+{
+  "production": false,
+  "supabase": {
+    "url": "__SUPABASE_URL__",
+    "anonKey": "__SUPABASE_KEY__"
+  },
+  "environment": "development",
+  "features": {
+    "enableDebugMode": true,
+    "enableAnalytics": false
+  }
+}

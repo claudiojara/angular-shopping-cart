@@ -1,15 +1,145 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>ShoppingCart</title>
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-</head>
-<body>
-  <app-root></app-root>
-</body>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Forja del Destino - Lámparas de Diseño Minimalista | Impresas en 3D Chile</title>
+    <base href="/" />
+
+    <!-- Viewport y compatibilidad -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Meta tags SEO básicos -->
+    <meta
+      name="description"
+      content="Descubre nuestra colección de lámparas de diseño minimalista impresas en 3D. Ilumina tus espacios con piezas únicas, sostenibles y hechas en Chile. Envío gratis en compras sobre $45.000."
+    />
+    <meta
+      name="keywords"
+      content="lámparas de diseño, lámparas minimalistas, lámparas 3D, iluminación decorativa, veladores modernos, decoración Chile, lámparas impresas 3D, iluminación LED"
+    />
+    <meta name="author" content="Forja del Destino" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Theme color para navegadores móviles -->
+    <meta name="theme-color" content="#2D2D2D" />
+    <meta name="msapplication-TileColor" content="#2D2D2D" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://lumina.cl" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+    <link rel="alternate icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" href="assets/logo.svg" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lumina.cl" />
+    <meta
+      property="og:title"
+      content="Forja del Destino - Lámparas de Diseño Minimalista | Impresas en 3D Chile"
+    />
+    <meta
+      property="og:description"
+      content="Descubre nuestra colección de lámparas de diseño minimalista impresas en 3D. Ilumina tus espacios con piezas únicas, sostenibles y hechas en Chile."
+    />
+    <meta
+      property="og:image"
+      content="https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=1200&h=630&fit=crop"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="es_CL" />
+    <meta property="og:site_name" content="Forja del Destino" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://lumina.cl" />
+    <meta
+      name="twitter:title"
+      content="Forja del Destino - Lámparas de Diseño Minimalista | Impresas en 3D Chile"
+    />
+    <meta
+      name="twitter:description"
+      content="Descubre nuestra colección de lámparas de diseño minimalista impresas en 3D. Ilumina tus espacios con piezas únicas, sostenibles y hechas en Chile."
+    />
+    <meta
+      name="twitter:image"
+      content="https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=1200&h=630&fit=crop"
+    />
+    <meta name="twitter:site" content="@lumina_cl" />
+
+    <!-- DNS prefetch y preconnect para dominios externos -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <link rel="dns-prefetch" href="https://images.unsplash.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
+
+    <!-- Preload fuentes críticas -->
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+      as="style"
+    />
+
+    <!-- Preload LCP image (first product image) -->
+    <link
+      rel="preload"
+      as="image"
+      href="https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400&q=80&fm=webp"
+      type="image/webp"
+      fetchpriority="high"
+    />
+
+    <!-- Critical CSS to prevent CLS from fonts -->
+    <style>
+      /* Prevent layout shift during font loading */
+      html {
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+      }
+
+      /* Reserve space for dynamic content */
+      app-root {
+        display: block;
+        min-height: 100vh;
+      }
+
+      /* Prevent content jumps */
+      body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+      }
+    </style>
+
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  </head>
+  <body>
+    <app-root></app-root>
+
+    <!-- Noscript message for SEO -->
+    <noscript>
+      <div style="padding: 20px; text-align: center; font-family: sans-serif">
+        <h1>Forja del Destino - Lámparas de Diseño</h1>
+        <p>
+          Para disfrutar de la mejor experiencia en nuestra tienda de lámparas, por favor habilita
+          JavaScript en tu navegador.
+        </p>
+      </div>
+    </noscript>
+  </body>
 </html>

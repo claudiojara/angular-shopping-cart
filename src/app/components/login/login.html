@@ -8,53 +8,61 @@
       <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Correo Electrónico</mat-label>
-          <input 
-            matInput 
-            type="email" 
+          <input
+            matInput
+            type="email"
             [ngModel]="email()"
             (ngModelChange)="email.set($event)"
             name="email"
             required
             [disabled]="loading()"
-            autocomplete="email">
+            autocomplete="email"
+            data-testid="login-email-input"
+          />
           <mat-icon matPrefix>email</mat-icon>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Contraseña</mat-label>
-          <input 
-            matInput 
+          <input
+            matInput
             [type]="hidePassword() ? 'password' : 'text'"
             [ngModel]="password()"
             (ngModelChange)="password.set($event)"
             name="password"
             required
             [disabled]="loading()"
-            autocomplete="current-password">
+            autocomplete="current-password"
+            data-testid="login-password-input"
+          />
           <mat-icon matPrefix>lock</mat-icon>
-          <button 
-            mat-icon-button 
-            matSuffix 
+          <button
+            mat-icon-button
+            matSuffix
             type="button"
             (click)="togglePasswordVisibility()"
-            [disabled]="loading()">
-            <mat-icon>{{hidePassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
+            [disabled]="loading()"
+            data-testid="login-toggle-password"
+          >
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
         </mat-form-field>
 
         @if (error()) {
-          <div class="error-message">
+          <div class="error-message" data-testid="login-error-message">
             <mat-icon>error</mat-icon>
             <span>{{ error() }}</span>
           </div>
         }
 
-        <button 
-          mat-raised-button 
-          color="primary" 
+        <button
+          mat-raised-button
+          color="primary"
           type="submit"
           class="full-width submit-button"
-          [disabled]="loading() || !loginForm.form.valid">
+          [disabled]="loading() || !loginForm.form.valid"
+          data-testid="login-submit-button"
+        >
           @if (loading()) {
             <mat-spinner diameter="20"></mat-spinner>
           } @else {
