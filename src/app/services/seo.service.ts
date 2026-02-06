@@ -14,7 +14,7 @@ export class SeoService {
   private title = inject(Title);
 
   private readonly defaultConfig: SeoConfig = {
-    title: 'Lumina - Lámparas de Diseño Minimalista | Impresas en 3D Chile',
+    title: 'Forja del Destino - Lámparas de Diseño Minimalista | Impresas en 3D Chile',
     description:
       'Descubre nuestra colección de lámparas de diseño minimalista impresas en 3D. Ilumina tus espacios con piezas únicas, sostenibles y hechas en Chile. Envío gratis en compras sobre $45.000.',
     keywords: [
@@ -56,7 +56,9 @@ export class SeoService {
    * Update page title with brand suffix
    */
   updateTitle(pageTitle: string): void {
-    const fullTitle = pageTitle.includes('Lumina') ? pageTitle : `${pageTitle} | Lumina`;
+    const fullTitle = pageTitle.includes('Forja del Destino')
+      ? pageTitle
+      : `${pageTitle} | Forja del Destino`;
     this.title.setTitle(fullTitle);
     this.meta.updateTag({ property: 'og:title', content: fullTitle });
     this.meta.updateTag({ name: 'twitter:title', content: fullTitle });
@@ -85,7 +87,7 @@ export class SeoService {
    */
   private updateOpenGraph(config: SeoConfig): void {
     this.meta.updateTag({ property: 'og:type', content: config.type || 'website' });
-    this.meta.updateTag({ property: 'og:site_name', content: 'Lumina' });
+    this.meta.updateTag({ property: 'og:site_name', content: 'Forja del Destino' });
 
     const image =
       config.image ||
@@ -160,7 +162,7 @@ export class SeoService {
     const organizationSchema = {
       '@context': 'https://schema.org',
       '@type': 'Organization' as const,
-      name: 'Lumina',
+      name: 'Forja del Destino',
       url: 'https://lumina.cl',
       logo: 'https://lumina.cl/assets/logo.svg',
       description: 'Lámparas de diseño minimalista impresas en 3D. Piezas únicas hechas en Chile.',
@@ -198,7 +200,7 @@ export class SeoService {
       description: product.description,
       brand: {
         '@type': 'Brand',
-        name: 'Lumina',
+        name: 'Forja del Destino',
       },
       offers: {
         '@type': 'Offer',
@@ -237,7 +239,7 @@ export class SeoService {
     const webSiteSchema = {
       '@context': 'https://schema.org',
       '@type': 'WebSite' as const,
-      name: 'Lumina - Lámparas de Diseño',
+      name: 'Forja del Destino - Lámparas de Diseño',
       url: 'https://lumina.cl',
       potentialAction: {
         '@type': 'SearchAction',

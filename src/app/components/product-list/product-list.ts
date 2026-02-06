@@ -59,7 +59,7 @@ export class ProductList {
   constructor() {
     // Set SEO for products page
     this.seoService.updateSeo({
-      title: 'Lámparas de Diseño Minimalista | Catálogo Lumina',
+      title: 'Lámparas de Diseño Minimalista | Catálogo Forja del Destino',
       description:
         'Descubre nuestra colección de lámparas de diseño minimalista impresas en 3D. Veladores, lámparas de mesa y más. Envío gratis en compras sobre $45.000.',
       type: 'website',
