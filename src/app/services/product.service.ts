@@ -112,11 +112,9 @@ export class ProductService {
       // Build query description for monitoring
       const filterParts: string[] = [];
 
-      // Apply filters
-      if (filters.category) {
-        query = query.contains('categories', [{ name: filters.category }]);
-        filterParts.push(`category=${filters.category}`);
-      }
+      // NOTE: Category filtering is done client-side after loading
+      // because Supabase JSON operators are complex and error-prone.
+      // We load all products matching other filters, then filter by category in memory.
 
       if (filters.minPrice !== undefined) {
         query = query.gte('price', filters.minPrice);
@@ -166,9 +164,14 @@ export class ProductService {
 
       if (error) throw error;
 
-      const products = (data as ProductFromDB[]).map((dbProduct) =>
+      let products = (data as ProductFromDB[]).map((dbProduct) =>
         this.mapDbProductToProduct(dbProduct),
       );
+
+      // Apply client-side category filter if specified
+      if (filters.category) {
+        products = products.filter((p) => p.category === filters.category);
+      }
 
       this._products.set(products);
       this._totalCount.set(count ?? products.length);
