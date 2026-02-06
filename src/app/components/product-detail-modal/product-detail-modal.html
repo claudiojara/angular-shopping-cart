@@ -1,0 +1,142 @@
+<div class="product-detail-modal">
+  <!-- Close Button -->
+  <button mat-icon-button class="close-btn" (click)="close()" aria-label="Cerrar">
+    <mat-icon>close</mat-icon>
+  </button>
+
+  <div class="modal-content">
+    <!-- Left: Images -->
+    <div class="image-section">
+      <!-- Main Image -->
+      <div class="main-image">
+        @if (product.badge) {
+          <span class="product-badge">{{ product.badge }}</span>
+        }
+        @if (isInCart()) {
+          <span class="in-cart-badge">
+            <mat-icon>shopping_cart</mat-icon>
+            En el carrito ({{ getCartQuantity() }})
+          </span>
+        }
+        <img [src]="selectedImage()" [alt]="product.name" class="product-image" />
+      </div>
+
+      <!-- Thumbnail Gallery (if multiple images exist) -->
+      <!-- Note: Currently products only have one image, so this is hidden -->
+      <!-- In the future, when products have multiple images, show them here -->
+    </div>
+
+    <!-- Right: Details -->
+    <div class="detail-section">
+      <!-- Brand -->
+      <span class="product-brand">Forja del Destino</span>
+
+      <!-- Title -->
+      <h2 class="product-title">{{ product.name }}</h2>
+
+      <!-- Rating -->
+      <div class="product-rating">
+        <div class="stars">
+          @for (star of getStarsArray(product.rating); track star) {
+            <mat-icon class="star-icon" [class.filled]="star <= product.rating">
+              {{ star <= product.rating ? 'star' : 'star_border' }}
+            </mat-icon>
+          }
+        </div>
+        <span class="review-count">({{ product.reviewCount }} reseñas)</span>
+      </div>
+
+      <!-- Price -->
+      <div class="product-prices">
+        @if (product.originalPrice) {
+          <span class="original-price">{{ formatPrice(product.originalPrice) }}</span>
+        }
+        <span class="current-price">{{ formatPrice(product.price) }}</span>
+        @if (product.originalPrice) {
+          <span class="discount-badge">
+            -{{ calculateDiscount(product.originalPrice, product.price) }}%
+          </span>
+        }
+      </div>
+
+      <!-- Description -->
+      <div class="product-description">
+        <h3>Descripción</h3>
+        <p>{{ product.description }}</p>
+      </div>
+
+      <!-- Category -->
+      <div class="product-info">
+        <div class="info-item">
+          <mat-icon>category</mat-icon>
+          <span>{{ product.category }}</span>
+        </div>
+        @if (product.material) {
+          <div class="info-item">
+            <mat-icon>texture</mat-icon>
+            <span>{{ product.material }}</span>
+          </div>
+        }
+        @if (product.stockQuantity !== undefined) {
+          <div class="info-item">
+            <mat-icon>inventory_2</mat-icon>
+            <span>
+              @if (product.stockQuantity > 10) {
+                <span class="stock-good">En stock ({{ product.stockQuantity }} disponibles)</span>
+              } @else if (product.stockQuantity > 0) {
+                <span class="stock-low">Últimas {{ product.stockQuantity }} unidades</span>
+              } @else {
+                <span class="stock-out">Agotado</span>
+              }
+            </span>
+          </div>
+        }
+      </div>
+
+      <!-- Variants -->
+      @if (product.variants && product.variants.length > 0) {
+        <div class="product-variants">
+          <h4>Variantes disponibles:</h4>
+          <div class="variant-chips">
+            @for (variant of product.variants; track variant) {
+              <mat-chip>{{ variant }}</mat-chip>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Actions -->
+      <div class="modal-actions">
+        @if (!isInCart()) {
+          <button
+            mat-raised-button
+            color="primary"
+            class="add-to-cart-btn"
+            (click)="addToCart()"
+            [disabled]="product.stockQuantity === 0"
+          >
+            <mat-icon>add_shopping_cart</mat-icon>
+            Agregar al Carrito
+          </button>
+        } @else {
+          <button mat-raised-button color="accent" class="view-cart-btn" (click)="goToCart()">
+            <mat-icon>shopping_cart</mat-icon>
+            Ver Carrito
+          </button>
+          <button mat-stroked-button color="primary" class="add-more-btn" (click)="addToCart()">
+            <mat-icon>add</mat-icon>
+            Agregar más
+          </button>
+        }
+      </div>
+
+      <!-- Stock Warning -->
+      @if (product.stockQuantity === 0) {
+        <div class="stock-warning">
+          <mat-icon>warning</mat-icon>
+          <span>Este producto está temporalmente agotado</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>
