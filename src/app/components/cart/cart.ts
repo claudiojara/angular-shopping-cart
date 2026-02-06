@@ -26,6 +26,7 @@ import { ClpCurrencyPipe } from '../../pipes/clp-currency.pipe';
     MatBadgeModule,
     MatTooltipModule,
     OptimizedImagePipe,
+    ClpCurrencyPipe,
   ],
   templateUrl: './cart.html',
   styleUrl: './cart.scss',
