@@ -189,7 +189,7 @@
       }
 
       <!-- Quantity Selector -->
-      @if (!isInCart() && product.stockQuantity > 0) {
+      @if (!isInCart() && product.stockQuantity !== undefined && product.stockQuantity > 0) {
         <div class="quantity-selector">
           <label>Cantidad:</label>
           <div class="quantity-controls">
