@@ -9,6 +9,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { CartService } from './services/cart.service';
 import { SupabaseService } from './services/supabase.service';
 import { SeoService } from './services/seo.service';
+import { Footer } from './components/footer/footer';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +24,7 @@ import { SeoService } from './services/seo.service';
     MatBadgeModule,
     MatMenuModule,
     MatDividerModule,
+    Footer,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',

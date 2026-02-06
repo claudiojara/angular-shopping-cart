@@ -1,0 +1,151 @@
+<footer class="main-footer" role="contentinfo">
+  <!-- Main Footer Content -->
+  <div class="footer-main">
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Brand Column -->
+        <div class="footer-brand">
+          <a routerLink="/" class="footer-logo-link" aria-label="Ir al inicio">
+            <img src="assets/logo.svg" alt="Lumina" class="footer-logo" width="140" height="45" />
+          </a>
+          <p class="footer-description">
+            Decoración minimalista impresa en 3D. Piezas únicas hechas en Chile, creadas capa por
+            capa para transformar tus espacios con estilo.
+          </p>
+          <div class="social-links">
+            <a
+              href="https://www.instagram.com/lumina.cl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-link"
+              aria-label="Síguenos en Instagram"
+            >
+              <mat-icon>instagram</mat-icon>
+            </a>
+            <a
+              href="https://www.facebook.com/lumina.cl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-link"
+              aria-label="Síguenos en Facebook"
+            >
+              <mat-icon>facebook</mat-icon>
+            </a>
+          </div>
+        </div>
+
+        <!-- Information Links -->
+        <div class="footer-column">
+          <h3 class="footer-column-title">Información</h3>
+          <nav class="footer-nav" aria-label="Enlaces informativos">
+            <a routerLink="/shipping" class="footer-link">Envíos y devoluciones</a>
+            <a routerLink="/refund" class="footer-link">Política de reembolso</a>
+            <a routerLink="/privacy" class="footer-link">Política de privacidad</a>
+            <a routerLink="/terms" class="footer-link">Términos y Condiciones</a>
+          </nav>
+        </div>
+
+        <!-- Menu Links -->
+        <div class="footer-column">
+          <h3 class="footer-column-title">Menú</h3>
+          <nav class="footer-nav" aria-label="Menú principal">
+            <a routerLink="/about" class="footer-link">¿Qué hacemos y cómo lo hacemos?</a>
+            <a routerLink="/blog" class="footer-link">Blog</a>
+            <a routerLink="/contact" class="footer-link">Contacto</a>
+          </nav>
+        </div>
+
+        <!-- Contact Column -->
+        <div class="footer-column">
+          <h3 class="footer-column-title">Contacto</h3>
+          <div class="footer-contact">
+            <a href="mailto:hola@lumina.cl" class="contact-link">
+              <mat-icon>email</mat-icon>
+              <span>hola@lumina.cl</span>
+            </a>
+            <a
+              href="https://wa.me/569XXXXXXXX"
+              class="contact-link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <mat-icon>whatsapp</mat-icon>
+              <span>+56 9 XXXX XXXX</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Methods -->
+  <div class="footer-payments">
+    <div class="container">
+      <div class="payment-methods">
+        <span class="payment-label">Métodos de pago:</span>
+        <div class="payment-icons">
+          <!-- Mercado Pago -->
+          <div class="payment-icon" title="Mercado Pago">
+            <svg viewBox="0 0 120 30" width="80" height="20">
+              <rect fill="#00B1EA" width="120" height="30" rx="4" />
+              <text x="10" y="20" fill="white" font-size="12" font-weight="bold">mercado pago</text>
+            </svg>
+          </div>
+          <!-- Webpay -->
+          <div class="payment-icon" title="Webpay">
+            <svg viewBox="0 0 80 30" width="60" height="22">
+              <rect fill="#E4002B" width="80" height="30" rx="4" />
+              <text x="8" y="20" fill="white" font-size="11" font-weight="bold">webpay</text>
+            </svg>
+          </div>
+          <!-- Visa -->
+          <div class="payment-icon" title="Visa">
+            <svg viewBox="0 0 60 30" width="50" height="25">
+              <rect fill="#1A1F71" width="60" height="30" rx="4" />
+              <text x="8" y="20" fill="white" font-size="14" font-weight="bold" font-style="italic">
+                VISA
+              </text>
+            </svg>
+          </div>
+          <!-- Mastercard -->
+          <div class="payment-icon" title="Mastercard">
+            <svg viewBox="0 0 50 30" width="45" height="27">
+              <circle cx="15" cy="15" r="12" fill="#EB001B" />
+              <circle cx="28" cy="15" r="12" fill="#F79E1B" />
+              <path d="M21.5 6a12 12 0 0 0 0 18 12 12 0 0 0 0-18z" fill="#FF5F00" />
+            </svg>
+          </div>
+          <!-- American Express -->
+          <div class="payment-icon" title="American Express">
+            <svg viewBox="0 0 60 30" width="50" height="25">
+              <rect fill="#016FD0" width="60" height="30" rx="4" />
+              <text x="5" y="12" fill="white" font-size="8" font-weight="bold">AMERICAN</text>
+              <text x="5" y="22" fill="white" font-size="8" font-weight="bold">EXPRESS</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Bottom -->
+  <div class="footer-bottom">
+    <div class="container">
+      <div class="footer-bottom-content">
+        <p class="copyright">© {{ currentYear }} Lumina. Todos los derechos reservados.</p>
+        <p class="made-with">Hecho con <mat-icon class="heart-icon">favorite</mat-icon> en Chile</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- WhatsApp Float Button -->
+  <a
+    href="https://wa.me/569XXXXXXXX?text=Hola,%20quiero%20más%20información%20sobre%20sus%20productos"
+    class="whatsapp-float"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Contáctanos por WhatsApp"
+  >
+    <mat-icon>whatsapp</mat-icon>
+  </a>
+</footer>
