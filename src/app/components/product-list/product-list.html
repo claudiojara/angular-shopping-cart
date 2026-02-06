@@ -1,46 +1,215 @@
-<div class="product-grid" data-testid="product-grid">
-  @for (product of products(); track product.id) {
-    <mat-card class="product-card" [attr.data-testid]="'product-card-' + product.id">
-      <img
-        mat-card-image
-        [src]="product.image"
-        [alt]="product.name"
-        [attr.data-testid]="'product-image-' + product.id"
-      />
+<div class="product-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a routerLink="/" class="breadcrumb-link">Inicio</a>
+        <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
+        <span class="breadcrumb-current">Lámparas</span>
+      </nav>
 
-      <mat-card-header>
-        <mat-card-title [attr.data-testid]="'product-name-' + product.id">{{
-          product.name
-        }}</mat-card-title>
-        <mat-card-subtitle>
-          <mat-chip class="category-chip" [attr.data-testid]="'product-category-' + product.id">{{
-            product.category
-          }}</mat-chip>
-        </mat-card-subtitle>
-      </mat-card-header>
+      <h1 class="page-title">Lámparas</h1>
+      <p class="page-description">
+        Descubre nuestras lámparas de diseño minimalista en impresión 3D. Ilumina tus espacios con
+        estilo y originalidad. Hechas a medida, sostenibles y únicas en Chile.
+      </p>
+    </div>
+  </div>
 
-      <mat-card-content>
-        <p class="product-description" [attr.data-testid]="'product-description-' + product.id">
-          {{ product.description }}
-        </p>
-        <p class="product-price" [attr.data-testid]="'product-price-' + product.id">
-          {{ product.price | currency }}
-        </p>
-      </mat-card-content>
+  <!-- Main Content -->
+  <div class="container">
+    <div class="product-layout">
+      <!-- Sidebar Filters -->
+      <aside class="filters-sidebar" role="complementary" aria-label="Filtros de productos">
+        <div class="filters-header">
+          <h2 class="filters-title">
+            <mat-icon>filter_list</mat-icon>
+            Filtrar Productos
+          </h2>
+          @if (selectedCategory() || priceRange().min > 0 || priceRange().max < 50000) {
+            <button mat-button color="accent" (click)="clearFilters()" class="clear-filters-btn">
+              Limpiar
+            </button>
+          }
+        </div>
 
-      <mat-card-actions>
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="addToCart(product)"
-          [attr.data-testid]="'add-to-cart-' + product.id"
-          aria-label="Agregar {{ product.name }} al carrito"
-          class="add-to-cart-btn"
-        >
-          <mat-icon>add_shopping_cart</mat-icon>
-          Agregar al Carrito
-        </button>
-      </mat-card-actions>
-    </mat-card>
-  }
+        <!-- Categories -->
+        <mat-expansion-panel expanded class="filter-section">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Categorías</mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="filter-options">
+            <button
+              mat-button
+              class="filter-option"
+              [class.active]="selectedCategory() === ''"
+              (click)="setCategory('')"
+            >
+              Todas las categorías
+            </button>
+            @for (category of categories; track category) {
+              <button
+                mat-button
+                class="filter-option"
+                [class.active]="selectedCategory() === category"
+                (click)="setCategory(category)"
+              >
+                {{ category }}
+              </button>
+            }
+          </div>
+        </mat-expansion-panel>
+
+        <!-- Price Range -->
+        <mat-expansion-panel expanded class="filter-section">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Precio</mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="price-range">
+            <div class="price-inputs">
+              <mat-form-field appearance="outline" class="price-input">
+                <mat-label>Desde</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  [(ngModel)]="priceRange().min"
+                  (ngModelChange)="priceRange.set({ ...priceRange(), min: $event })"
+                />
+              </mat-form-field>
+              <span class="price-separator">-</span>
+              <mat-form-field appearance="outline" class="price-input">
+                <mat-label>Hasta</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  [(ngModel)]="priceRange().max"
+                  (ngModelChange)="priceRange.set({ ...priceRange(), max: $event })"
+                />
+              </mat-form-field>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </aside>
+
+      <!-- Products Grid -->
+      <main class="products-content">
+        <!-- Toolbar -->
+        <div class="products-toolbar">
+          <span class="results-count"> {{ productCount() }} productos </span>
+
+          <mat-form-field appearance="outline" class="sort-select">
+            <mat-label>Ordenar por</mat-label>
+            <mat-select [(value)]="sortBy">
+              <mat-option value="featured">Destacados</mat-option>
+              <mat-option value="price-asc">Precio: menor a mayor</mat-option>
+              <mat-option value="price-desc">Precio: mayor a menor</mat-option>
+              <mat-option value="rating">Mejor valorados</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Empty State -->
+        @if (productCount() === 0) {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">search_off</mat-icon>
+            <h3>No se encontraron productos</h3>
+            <p>Intenta ajustar los filtros para ver más resultados.</p>
+            <button mat-raised-button color="primary" (click)="clearFilters()">
+              Limpiar filtros
+            </button>
+          </div>
+        }
+
+        <!-- Product Grid -->
+        <div class="product-grid" data-testid="product-grid">
+          @for (product of filteredProducts(); track product.id) {
+            <mat-card class="product-card" [attr.data-testid]="'product-card-' + product.id">
+              <!-- Badge -->
+              @if (product.badge) {
+                <span class="product-badge">{{ product.badge }}</span>
+              }
+
+              <!-- Image -->
+              <div class="product-image-wrapper">
+                <img
+                  [src]="product.image"
+                  [alt]="product.name"
+                  class="product-image"
+                  loading="lazy"
+                  [attr.data-testid]="'product-image-' + product.id"
+                />
+              </div>
+
+              <!-- Content -->
+              <mat-card-content class="product-content">
+                <!-- Rating -->
+                <div class="product-rating">
+                  <div class="stars">
+                    @for (star of getStarsArray(product.rating); track star) {
+                      <mat-icon
+                        class="star-icon"
+                        [class.filled]="star <= product.rating"
+                        [class.half]="star > product.rating && star - 0.5 <= product.rating"
+                      >
+                        {{
+                          star <= product.rating
+                            ? 'star'
+                            : star - 0.5 <= product.rating
+                              ? 'star_half'
+                              : 'star_border'
+                        }}
+                      </mat-icon>
+                    }
+                  </div>
+                  <span class="review-count">({{ product.reviewCount }} reseñas)</span>
+                </div>
+
+                <!-- Brand -->
+                <span class="product-brand">Lumina</span>
+
+                <!-- Name -->
+                <h3 class="product-name" [attr.data-testid]="'product-name-' + product.id">
+                  {{ product.name }}
+                </h3>
+
+                <!-- Prices -->
+                <div class="product-prices">
+                  @if (product.originalPrice) {
+                    <span class="original-price"> {{ formatPrice(product.originalPrice) }} </span>
+                  }
+                  <span class="current-price" [attr.data-testid]="'product-price-' + product.id">
+                    {{ formatPrice(product.price) }}
+                  </span>
+                </div>
+
+                <!-- Variants -->
+                @if (product.variants && product.variants.length > 0) {
+                  <div class="product-variants">
+                    @for (variant of product.variants; track variant) {
+                      <span class="variant-badge">{{ variant }}</span>
+                    }
+                  </div>
+                }
+              </mat-card-content>
+
+              <!-- Actions -->
+              <mat-card-actions class="product-actions">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  (click)="addToCart(product)"
+                  class="add-to-cart-btn"
+                  [attr.data-testid]="'add-to-cart-' + product.id"
+                  [matTooltip]="'Agregar ' + product.name + ' al carrito'"
+                >
+                  <mat-icon>add_shopping_cart</mat-icon>
+                  Agregar al Carrito
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          }
+        </div>
+      </main>
+    </div>
+  </div>
 </div>
