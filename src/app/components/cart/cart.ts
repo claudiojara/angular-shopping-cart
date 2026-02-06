@@ -1,5 +1,6 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,6 +15,7 @@ import { CartService } from '../../services/cart.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
+    RouterModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -49,7 +51,13 @@ export class Cart {
   }
 
   checkout(): void {
-    alert('¡Gracias por tu compra! Total: ' + this.total().toFixed(2));
+    const formattedTotal = new Intl.NumberFormat('es-CL', {
+      style: 'currency',
+      currency: 'CLP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(this.total());
+    alert('¡Gracias por tu compra! Total: ' + formattedTotal);
     this.clearCart();
   }
 }
