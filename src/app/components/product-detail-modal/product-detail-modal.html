@@ -106,6 +106,18 @@
         <p>{{ product.description }}</p>
       </div>
 
+      <!-- Tags (Style tags) -->
+      @if (product.tags && product.tags.length > 0) {
+        <div class="product-tags">
+          <h4>Estilo</h4>
+          <div class="tag-chips">
+            @for (tag of product.tags; track tag) {
+              <span class="tag-chip">{{ tag }}</span>
+            }
+          </div>
+        </div>
+      }
+
       <!-- Category -->
       <div class="product-info">
         <div class="info-item">

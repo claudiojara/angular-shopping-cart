@@ -292,6 +292,43 @@
   }
 }
 
+.product-tags {
+  h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-text-primary);
+  }
+
+  .tag-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+
+  .tag-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-xs) var(--spacing-md);
+    background: linear-gradient(135deg, rgba(63, 81, 181, 0.08) 0%, rgba(63, 81, 181, 0.12) 100%);
+    border: 1px solid rgba(63, 81, 181, 0.2);
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-primary);
+    letter-spacing: 0.3px;
+    transition: all 0.2s ease;
+    cursor: default;
+
+    &:hover {
+      background: linear-gradient(135deg, rgba(63, 81, 181, 0.12) 0%, rgba(63, 81, 181, 0.16) 100%);
+      border-color: rgba(63, 81, 181, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(63, 81, 181, 0.15);
+    }
+  }
+}
+
 .product-info {
   display: flex;
   flex-direction: column;

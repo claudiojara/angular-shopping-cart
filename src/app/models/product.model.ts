@@ -12,6 +12,7 @@ export interface Product {
   image: string;
   images?: ProductImage[]; // Gallery images from database
   category: string;
+  tags?: string[]; // Style tags (e.g., "geométrico", "minimalista")
   rating: number;
   reviewCount: number;
   variants?: string[];

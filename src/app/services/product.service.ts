@@ -318,6 +318,9 @@ export class ProductService {
     // Get first category name
     const categoryName = dbProduct.categories[0]?.name || 'Sin categoría';
 
+    // Extract tag names
+    const tagNames = dbProduct.tags.map((t) => t.name);
+
     // Extract variant sizes
     const variantSizes = dbProduct.variants
       .map((v) => v.size)
@@ -344,6 +347,7 @@ export class ProductService {
       image: imageUrl,
       images: dbProduct.images.length > 0 ? dbProduct.images : undefined, // Gallery images
       category: categoryName,
+      tags: tagNames.length > 0 ? tagNames : undefined,
       rating: dbProduct.average_rating,
       reviewCount: dbProduct.review_count,
       variants: variantSizes.length > 0 ? variantSizes : undefined,
