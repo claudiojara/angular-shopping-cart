@@ -61,9 +61,11 @@
                 >
                   <div class="item-content">
                     <img
-                      [src]="item.product.image"
+                      [src]="item.product.image | optimizedImage: 100"
                       [alt]="item.product.name"
                       class="item-image"
+                      loading="lazy"
+                      decoding="async"
                       [attr.data-testid]="'cart-item-image-' + item.product.id"
                     />
 

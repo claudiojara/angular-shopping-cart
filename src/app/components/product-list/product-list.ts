@@ -23,6 +23,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { SeoService } from '../../services/seo.service';
+import { OptimizedImagePipe } from '../../pipes/optimized-image.pipe';
 import { Product } from '../../models/product.model';
 
 type SortOption = 'featured' | 'price-asc' | 'price-desc' | 'rating';
@@ -48,6 +49,7 @@ type SortOption = 'featured' | 'price-asc' | 'price-desc' | 'rating';
     MatExpansionModule,
     MatSliderModule,
     MatBadgeModule,
+    OptimizedImagePipe,
   ],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',

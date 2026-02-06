@@ -138,10 +138,11 @@
               <!-- Image -->
               <div class="product-image-wrapper">
                 <img
-                  [src]="product.image"
+                  [src]="product.image | optimizedImage: 600"
                   [alt]="product.name"
                   class="product-image"
                   loading="lazy"
+                  decoding="async"
                   [attr.data-testid]="'product-image-' + product.id"
                 />
               </div>

@@ -9,6 +9,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CartService } from '../../services/cart.service';
+import { OptimizedImagePipe } from '../../pipes/optimized-image.pipe';
 import { ClpCurrencyPipe } from '../../pipes/clp-currency.pipe';
 
 @Component({
@@ -24,7 +25,7 @@ import { ClpCurrencyPipe } from '../../pipes/clp-currency.pipe';
     MatDividerModule,
     MatBadgeModule,
     MatTooltipModule,
-    ClpCurrencyPipe,
+    OptimizedImagePipe,
   ],
   templateUrl: './cart.html',
   styleUrl: './cart.scss',
