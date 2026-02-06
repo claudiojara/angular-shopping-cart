@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+  <!-- Icono de lámpara minimalista -->
+  <g transform="translate(10, 10)">
+    <!-- Pantalla de la lámpara -->
+    <path
+      d="M15 5C15 2.23858 17.2386 0 20 0H30C32.7614 0 35 2.23858 35 5V15C35 20.5228 30.5228 25 25 25C19.4772 25 15 20.5228 15 15V5Z"
+      fill="#2D2D2D"
+    />
+    <!-- Base de la lámpara -->
+    <rect x="20" y="25" width="10" height="3" fill="#2D2D2D" />
+    <rect x="18" y="28" width="14" height="2" rx="1" fill="#C9A86C" />
+    <!-- Cable -->
+    <path
+      d="M25 0V-5"
+      stroke="#2D2D2D"
+      stroke-width="2"
+      stroke-linecap="round"
+    />
+    <!-- Brillo/Luz -->
+    <circle cx="25" cy="15" r="8" fill="#C9A86C" opacity="0.3" />
+  </g>
+  
+  <!-- Texto LUMINA -->
+  <text
+    x="55"
+    y="38"
+    font-family="system-ui, -apple-system, sans-serif"
+    font-size="28"
+    font-weight="300"
+    fill="#2D2D2D"
+    letter-spacing="4"
+  >
+    LUMINA
+  </text>
+</svg>
