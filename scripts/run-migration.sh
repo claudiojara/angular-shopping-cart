@@ -2,7 +2,16 @@
 
 # Execute SQL migration via Supabase API
 
-ACCESS_TOKEN="sbp_737db4b830facf7b75085b1bd3acfce2966cad98"
+# Get token from environment variable or user input
+if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
+  echo "❌ Error: SUPABASE_ACCESS_TOKEN environment variable not set"
+  echo ""
+  echo "Get your token from: https://supabase.com/dashboard/account/tokens"
+  echo "Then run: export SUPABASE_ACCESS_TOKEN=your_token"
+  exit 1
+fi
+
+ACCESS_TOKEN="$SUPABASE_ACCESS_TOKEN"
 PROJECT_REF="owewtzddyykyraxkkorx"
 SQL_FILE="scripts/sql/14-create-orders-tables.sql"
 
