@@ -1,213 +1,182 @@
-import { Injectable, signal } from '@angular/core';
-import { Product } from '../models/product.model';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { Product, ProductFromDB } from '../models/product.model';
+import { SupabaseService } from './supabase.service';
 
 /**
- * Product service providing lamp catalog
+ * Product service providing lamp catalog from Supabase database
+ * Uses products_full_public view for optimized queries
  * All products are design lamps inspired by minimalist aesthetics
- * Images from Unsplash - optimized for web performance
  */
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  private products = signal<Product[]>([
-    {
-      id: 1,
-      name: 'Lunora',
-      description:
-        'Lámpara de mesa impresa en 3D con diseño geométrico. Luz cálida perfecta para crear ambientes acogedores.',
-      price: 30166,
-      originalPrice: 35490,
-      image:
-        'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=600&h=600&fit=crop&q=80',
-      category: 'Lámparas de Mesa',
-      rating: 5.0,
-      reviewCount: 3,
-      variants: ['+4', '+6'],
-      badge: '-15%',
-      material: 'PLA',
-    },
-    {
-      id: 2,
-      name: 'Velora',
-      description:
-        'Lámpara decorativa de luz cálida ideal para mesas y veladores. Diseño orgánico inspirado en formas naturales.',
-      price: 25491,
-      originalPrice: 29990,
-      image:
-        'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=600&h=600&fit=crop&q=80',
-      category: 'Lámparas de Velador',
-      rating: 5.0,
-      reviewCount: 7,
-      variants: ['+2', '+4'],
-      badge: '-15%',
-      material: 'PLA',
-    },
-    {
-      id: 3,
-      name: 'Swoola',
-      description:
-        'Lámpara de mesa con estilo nórdico. Elegante y funcional, perfecta para espacios modernos.',
-      price: 31016,
-      originalPrice: 36490,
-      image:
-        'https://images.unsplash.com/photo-1517991104123-1d56a6e81ed9?w=600&h=600&fit=crop&q=80',
-      category: 'Lámparas de Mesa',
-      rating: 5.0,
-      reviewCount: 2,
-      variants: ['+1', '+3'],
-      badge: '-15%',
-      material: 'PLA',
-    },
-    {
-      id: 4,
-      name: 'Prism',
-      description:
-        'Lámpara de mesa y velador con diseño prismático único. Crea efectos de luz espectaculares.',
-      price: 30591,
-      originalPrice: 35990,
-      image:
-        'https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=600&h=600&fit=crop&q=80',
-      category: 'Lámparas de Velador',
-      rating: 4.8,
-      reviewCount: 5,
-      variants: ['+2'],
-      badge: '-15%',
-      material: 'PLA',
-    },
-    {
-      id: 5,
-      name: 'Brimora',
-      description:
-        'Lámpara vanguardista de diseño contemporáneo. Pieza de conversación para espacios audaces.',
-      price: 29316,
-      originalPrice: 34490,
-      image:
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop&q=80',
-      category: 'Lámparas de Mesa',
-      rating: 5.0,
-      reviewCount: 3,
-      badge: '-15%',
-      material: 'ABS',
-    },
-    {
-      id: 6,
-      name: 'Fold',
-      description: 'Lámpara moderna con diseño plegable inspirado en origami. Ligera y versátil.',
-      price: 28891,
-      originalPrice: 33990,
-      image: 'https://images.unsplash.com/photo-1543198126-a8ad8e47fb22?w=600&h=600&fit=crop&q=80',
-      category: 'Colección Líneas',
-      rating: 4.9,
-      reviewCount: 4,
-      variants: ['+2'],
-      badge: '-15%',
-      material: 'PLA',
-    },
-    {
-      id: 7,
-      name: 'Lumis',
-      description:
-        'Lámpara de mesa y velador con diseño cilíndrico elegante. Iluminación difusa perfecta.',
-      price: 26341,
-      originalPrice: 30990,
-      image:
-        'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=600&h=600&fit=crop&q=80',
-      category: 'Lámparas de Velador',
-      rating: 5.0,
-      reviewCount: 2,
-      variants: ['+1'],
-      badge: '-15%',
-      material: 'PLA',
-    },
-    {
-      id: 8,
-      name: 'Lunor',
-      description: 'Lámpara decorativa de luz cálida para mesas y veladores. Diseño atemporal.',
-      price: 25066,
-      originalPrice: 29490,
-      image:
-        'https://images.unsplash.com/photo-1517991104123-1d56a6e81ed9?w=600&h=600&fit=crop&q=80',
-      category: 'Lámparas de Mesa',
-      rating: 4.7,
-      reviewCount: 8,
-      variants: ['+2', '+4'],
-      badge: '-15%',
-      material: 'PLA',
-    },
-    {
-      id: 9,
-      name: 'Luvia',
-      description:
-        'Lámpara de mesa inspirada en las lámparas de lava. Efecto visual relajante y único.',
-      price: 25066,
-      originalPrice: 29490,
-      image:
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop&q=80',
-      category: 'Colección Malla',
-      rating: 5.0,
-      reviewCount: 5,
-      variants: ['+5', '+7'],
-      badge: '-15%',
-      material: 'PLA',
-    },
-    {
-      id: 10,
-      name: 'Aluma',
-      description: 'Lámpara de mesa elegante y atemporal. Diseño clásico con toque moderno.',
-      price: 24641,
-      originalPrice: 28990,
-      image:
-        'https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=600&h=600&fit=crop&q=80',
-      category: 'Lámparas de Mesa',
-      rating: 5.0,
-      reviewCount: 3,
-      variants: ['+3', '+5'],
-      badge: '-15%',
-      material: 'PLA',
-    },
-    {
-      id: 11,
-      name: 'Orlo',
-      description: 'Lámpara decorativa de luz cálida para mesas y veladores. Diseño escandinavo.',
-      price: 24216,
-      originalPrice: 28490,
-      image:
-        'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=600&h=600&fit=crop&q=80',
-      category: 'Colección Líneas',
-      rating: 5.0,
-      reviewCount: 6,
-      variants: ['+1', '+3'],
-      badge: '-15%',
-      material: 'PLA',
-    },
-    {
-      id: 12,
-      name: 'Lunari',
-      description: 'Lámpara minimalista con diseño limpio. Perfecta para espacios contemporáneos.',
-      price: 21666,
-      originalPrice: 25490,
-      image: 'https://images.unsplash.com/photo-1543198126-a8ad8e47fb22?w=600&h=600&fit=crop&q=80',
-      category: 'Edición Limitada',
-      rating: 5.0,
-      reviewCount: 5,
-      badge: '-15%',
-      material: 'ABS',
-    },
-  ]);
+  private supabase = inject(SupabaseService);
 
-  readonly getProducts = this.products.asReadonly();
+  // Local state
+  private _products = signal<Product[]>([]);
+  private _loading = signal(false);
+  private _error = signal<string | null>(null);
 
+  // Public readonly signals
+  readonly products = this._products.asReadonly();
+  readonly loading = this._loading.asReadonly();
+  readonly error = this._error.asReadonly();
+
+  // Computed values
+  readonly categories = computed(() => {
+    const cats = new Set(this._products().map((p) => p.category));
+    return Array.from(cats);
+  });
+
+  readonly productCount = computed(() => this._products().length);
+
+  constructor() {
+    // Auto-load products on service initialization
+    this.loadProducts();
+  }
+
+  /**
+   * Load all products from database
+   *
+   * NOTA: Este método se llama automáticamente en el constructor.
+   * Si cambias datos en Supabase y quieres ver los cambios sin refrescar:
+   * 1. Abre DevTools (F12) → Console
+   * 2. Ejecuta: await ng.getComponent(document.querySelector('app-product-list')).productService.loadProducts()
+   */
+  async loadProducts(): Promise<void> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    try {
+      const { data, error } = await this.supabase.client
+        .from('products_full_public')
+        .select('*')
+        .eq('is_available', true)
+        .order('id');
+
+      if (error) throw error;
+
+      const products = (data as ProductFromDB[]).map((dbProduct) =>
+        this.mapDbProductToProduct(dbProduct),
+      );
+      this._products.set(products);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load products';
+      this._error.set(errorMessage);
+      console.error('Error loading products:', err);
+    } finally {
+      this._loading.set(false);
+    }
+  }
+
+  /**
+   * Get product by ID
+   */
   getProductById(id: number): Product | undefined {
-    return this.products().find((product) => product.id === id);
+    return this._products().find((product) => product.id === id);
   }
 
+  /**
+   * Get product by slug (SEO-friendly)
+   */
+  async getProductBySlug(slug: string): Promise<Product | null> {
+    try {
+      const { data, error } = await this.supabase.client
+        .from('products_full_public')
+        .select('*')
+        .eq('slug', slug)
+        .eq('is_available', true)
+        .single();
+
+      if (error) throw error;
+      if (!data) return null;
+
+      return this.mapDbProductToProduct(data as ProductFromDB);
+    } catch (err) {
+      console.error('Error loading product by slug:', err);
+      return null;
+    }
+  }
+
+  /**
+   * Get all available categories
+   */
   getCategories(): string[] {
-    const categories = new Set(this.products().map((p) => p.category));
-    return Array.from(categories);
+    return this.categories();
   }
 
+  /**
+   * Get products filtered by category
+   */
   getProductsByCategory(category: string): Product[] {
-    return this.products().filter((p) => p.category === category);
+    return this._products().filter((p) => p.category === category);
+  }
+
+  /**
+   * Get featured products
+   */
+  getFeaturedProducts(): Product[] {
+    return this._products().filter((p) => p.isFeatured === true);
+  }
+
+  /**
+   * Search products by name or description
+   */
+  searchProducts(query: string): Product[] {
+    const lowerQuery = query.toLowerCase();
+    return this._products().filter(
+      (p) =>
+        p.name.toLowerCase().includes(lowerQuery) ||
+        p.description.toLowerCase().includes(lowerQuery),
+    );
+  }
+
+  /**
+   * Map database product to frontend Product interface
+   */
+  private mapDbProductToProduct(dbProduct: ProductFromDB): Product {
+    // Get primary image or first available
+    const primaryImage = dbProduct.images.find((img) => img.is_primary);
+    const imageUrl = primaryImage?.image_url || dbProduct.images[0]?.image_url || '';
+
+    // Get first category name
+    const categoryName = dbProduct.categories[0]?.name || 'Sin categoría';
+
+    // Extract variant sizes
+    const variantSizes = dbProduct.variants
+      .map((v) => v.size)
+      .filter((s): s is string => s !== null);
+
+    // Calculate badge (discount percentage)
+    let badge: string | undefined;
+    if (dbProduct.original_price && dbProduct.original_price > dbProduct.price) {
+      const discount = Math.round(
+        ((dbProduct.original_price - dbProduct.price) / dbProduct.original_price) * 100,
+      );
+      badge = `-${discount}%`;
+    } else if (dbProduct.is_featured) {
+      badge = 'Destacado';
+    }
+
+    return {
+      id: dbProduct.id,
+      name: dbProduct.name,
+      slug: dbProduct.slug,
+      description: dbProduct.description,
+      price: dbProduct.price,
+      originalPrice: dbProduct.original_price ?? undefined,
+      image: imageUrl,
+      category: categoryName,
+      rating: dbProduct.average_rating,
+      reviewCount: dbProduct.review_count,
+      variants: variantSizes.length > 0 ? variantSizes : undefined,
+      badge,
+      material: dbProduct.material_code ?? undefined,
+      sku: dbProduct.sku ?? undefined,
+      stockQuantity: dbProduct.stock_quantity,
+      isAvailable: dbProduct.is_available,
+      isFeatured: dbProduct.is_featured,
+    };
   }
 }
