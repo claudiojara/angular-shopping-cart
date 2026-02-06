@@ -5,11 +5,6 @@
   },
   "routes": [
     {
-      "route": "/api/flow-webhook",
-      "methods": ["POST"],
-      "allowedRoles": ["anonymous"]
-    },
-    {
       "route": "/products",
       "rewrite": "/index.html"
     },
