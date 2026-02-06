@@ -139,9 +139,12 @@
               <div class="product-image-wrapper">
                 <img
                   [src]="product.image | optimizedImage: 400"
+                  [srcset]="product.image | srcSet"
+                  sizes="(max-width: 480px) 200px, (max-width: 768px) 400px, 600px"
                   [alt]="product.name"
                   class="product-image"
-                  loading="lazy"
+                  [attr.fetchpriority]="product.id === 1 ? 'high' : 'auto'"
+                  [loading]="product.id === 1 ? 'eager' : 'lazy'"
                   decoding="async"
                   [attr.data-testid]="'product-image-' + product.id"
                 />
