@@ -160,7 +160,7 @@ FLOW_SECRET_KEY (agregar)
 1. GitHub → Settings → Secrets and variables → Actions
 2. New repository secret
 3. Nombre: `SUPABASE_SERVICE_ROLE_KEY`
-4. Valor: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93ZXd0emRkeXlreXJheGtrb3J4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDI0MTcxNywiZXhwIjoyMDg1ODE3NzE3fQ.e3vt0qoJe_PYgYnYz6eKo6iOnazSyJNYErNe8Sn1KHo`
+4. Valor: `<GET_FROM_SUPABASE_DASHBOARD>` (obtener de https://supabase.com/dashboard/project/owewtzddyykyraxkkorx/settings/api)
 
 ## 🌐 Despliegue a Azure
 

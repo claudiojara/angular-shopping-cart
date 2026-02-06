@@ -12,8 +12,12 @@ https://owewtzddyykyraxkkorx.supabase.co
 
 ### SUPABASE_SERVICE_ROLE_KEY
 
+**⚠️ NEVER commit this key to Git!**
+
+Obtener de: https://supabase.com/dashboard/project/owewtzddyykyraxkkorx/settings/api
+
 ```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93ZXd0emRkeXlreXJheGtrb3J4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDI0MTcxNywiZXhwIjoyMDg1ODE3NzE3fQ.e3vt0qoJe_PYgYnYz6eKo6iOnazSyJNYErNe8Sn1KHo
+<YOUR_SUPABASE_SERVICE_ROLE_KEY>
 ```
 
 ### FLOW_SECRET_KEY
@@ -44,8 +48,8 @@ az staticwebapp appsettings set \
   --name witty-bush-0d65a3d0f \
   --setting-names \
     SUPABASE_URL="https://owewtzddyykyraxkkorx.supabase.co" \
-    SUPABASE_SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93ZXd0emRkeXlreXJheGtrb3J4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDI0MTcxNywiZXhwIjoyMDg1ODE3NzE3fQ.e3vt0qoJe_PYgYnYz6eKo6iOnazSyJNYErNe8Sn1KHo" \
-    FLOW_SECRET_KEY="f7a9d57a82f11c393ab3310e2d833f182c2b7d52"
+    SUPABASE_SERVICE_ROLE_KEY="<YOUR_SUPABASE_SERVICE_ROLE_KEY>" \
+    FLOW_SECRET_KEY="<YOUR_FLOW_SECRET_KEY>"
 ```
 
 **Nota:** Si no tienes Azure CLI instalado:

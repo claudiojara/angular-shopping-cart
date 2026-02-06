@@ -2,8 +2,15 @@ const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
 
 const supabaseUrl = 'https://owewtzddyykyraxkkorx.supabase.co';
-const supabaseKey =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93ZXd0emRkeXlreXJheGtrb3J4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDI0MTcxNywiZXhwIjoyMDg1ODE3NzE3fQ.e3vt0qoJe_PYgYnYz6eKo6iOnazSyJNYErNe8Sn1KHo';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseKey) {
+  console.error('ERROR: SUPABASE_SERVICE_ROLE_KEY environment variable not set');
+  console.error(
+    'Get it from: https://supabase.com/dashboard/project/owewtzddyykyraxkkorx/settings/api',
+  );
+  process.exit(1);
+}
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 

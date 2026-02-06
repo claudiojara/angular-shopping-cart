@@ -92,7 +92,7 @@ node -e "
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(
   'https://owewtzddyykyraxkkorx.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93ZXd0emRkeXlreXJheGtrb3J4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDI0MTcxNywiZXhwIjoyMDg1ODE3NzE3fQ.e3vt0qoJe_PYgYnYz6eKo6iOnazSyJNYErNe8Sn1KHo'
+  process.env.SUPABASE_SERVICE_ROLE_KEY || 'YOUR_SERVICE_ROLE_KEY'
 );
 supabase.from('orders').select('*').not('flow_token', 'is', null).then(console.log);
 "
