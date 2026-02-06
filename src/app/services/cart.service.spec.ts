@@ -53,14 +53,19 @@ describe('CartService', () => {
         single: jasmine.createSpy('single'),
       };
 
-      // Make all methods chainable
+      // Make all methods chainable - eq returns chain to allow multiple eq() calls
       chain.select.and.returnValue(chain);
       chain.insert.and.returnValue(chain);
       chain.update.and.returnValue(chain);
       chain.delete.and.returnValue(chain);
       chain.order.and.returnValue(chain);
-      chain.eq.and.returnValue(Promise.resolve({ data: null, error: null }));
+      chain.eq.and.returnValue(chain); // Changed to return chain for multiple .eq()
       chain.single.and.returnValue(Promise.resolve({ data: null, error: null }));
+
+      // Add then() method to chain to make it promise-like
+      chain.then = (onFulfilled: any) => {
+        return Promise.resolve({ data: null, error: null }).then(onFulfilled);
+      };
 
       return chain;
     };
