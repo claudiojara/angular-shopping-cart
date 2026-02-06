@@ -84,6 +84,9 @@ export class ProductList implements OnInit {
       const category = params['category'];
       if (category) {
         this.selectedCategory.set(category);
+      } else {
+        // Clear category filter when no category in query params
+        this.selectedCategory.set('');
       }
     });
   }

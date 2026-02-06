@@ -5,10 +5,16 @@
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a routerLink="/" class="breadcrumb-link">Inicio</a>
         <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
-        <span class="breadcrumb-current">Lámparas</span>
+        @if (selectedCategory()) {
+          <a routerLink="/products" class="breadcrumb-link">Lámparas</a>
+          <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
+          <span class="breadcrumb-current">{{ selectedCategory() }}</span>
+        } @else {
+          <span class="breadcrumb-current">Todas las Lámparas</span>
+        }
       </nav>
 
-      <h1 class="page-title">Lámparas</h1>
+      <h1 class="page-title">{{ selectedCategory() || 'Todas las Lámparas' }}</h1>
       <p class="page-description">
         Descubre nuestras lámparas de diseño minimalista en impresión 3D. Ilumina tus espacios con
         estilo y originalidad. Hechas a medida, sostenibles y únicas en Chile.

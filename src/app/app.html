@@ -36,7 +36,6 @@
         <nav class="main-nav" role="navigation" aria-label="Navegación principal">
           <a
             routerLink="/products"
-            [queryParams]="{}"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
             class="nav-link"
@@ -170,14 +169,7 @@
       </div>
       <mat-divider></mat-divider>
       <div class="mobile-menu-links">
-        <a
-          routerLink="/products"
-          [queryParams]="{}"
-          class="mobile-nav-link"
-          (click)="toggleMobileMenu()"
-        >
-          Todas
-        </a>
+        <a routerLink="/products" class="mobile-nav-link" (click)="toggleMobileMenu()"> Todas </a>
         <a
           routerLink="/products"
           [queryParams]="{ category: 'Lámparas de Mesa' }"
