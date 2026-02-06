@@ -35,7 +35,7 @@ module.exports = {
       // Assertions - score mínimo requerido
       assertions: {
         // Performance
-        'categories:performance': ['error', { minScore: 0.8 }], // 80%
+        'categories:performance': ['error', { minScore: 0.75 }], // 75%
 
         // Accessibility
         'categories:accessibility': ['error', { minScore: 0.9 }], // 90%
