@@ -65,7 +65,9 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: 'upload'
           app_location: 'dist/shopping-cart/browser'
+          api_location: 'api'
           skip_app_build: true
+          skip_api_build: false
 
       - name: Wait for deployment
         run: npx wait-on https://witty-bush-0d65a3d0f.2.azurestaticapps.net --timeout 120000
