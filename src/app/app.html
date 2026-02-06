@@ -36,27 +36,39 @@
         <nav class="main-nav" role="navigation" aria-label="Navegación principal">
           <a
             routerLink="/products"
+            [queryParams]="{}"
             routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
             class="nav-link"
             data-testid="navbar-products-button"
           >
-            Lámparas
+            Todas
           </a>
           <a
             routerLink="/products"
-            [queryParams]="{ category: 'Colección Malla' }"
+            [queryParams]="{ category: 'Lámparas de Mesa' }"
+            routerLinkActive="active"
             class="nav-link"
           >
-            Colección Malla
+            Lámparas de Mesa
           </a>
           <a
             routerLink="/products"
-            [queryParams]="{ category: 'Colección Líneas' }"
+            [queryParams]="{ category: 'Lámparas de Velador' }"
+            routerLinkActive="active"
             class="nav-link"
           >
-            Colección Líneas
+            Veladores
           </a>
-          <a routerLink="/contact" class="nav-link">Contacto</a>
+          <a
+            routerLink="/products"
+            [queryParams]="{ category: 'Edición Limitada' }"
+            routerLinkActive="active"
+            class="nav-link"
+          >
+            Edición Limitada
+          </a>
+          <a routerLink="/contact" routerLinkActive="active" class="nav-link">Contacto</a>
         </nav>
 
         <!-- Header Actions -->
@@ -158,24 +170,37 @@
       </div>
       <mat-divider></mat-divider>
       <div class="mobile-menu-links">
-        <a routerLink="/products" class="mobile-nav-link" (click)="toggleMobileMenu()">
-          Lámparas
-        </a>
         <a
           routerLink="/products"
-          [queryParams]="{ category: 'Colección Malla' }"
+          [queryParams]="{}"
           class="mobile-nav-link"
           (click)="toggleMobileMenu()"
         >
-          Colección Malla
+          Todas
         </a>
         <a
           routerLink="/products"
-          [queryParams]="{ category: 'Colección Líneas' }"
+          [queryParams]="{ category: 'Lámparas de Mesa' }"
           class="mobile-nav-link"
           (click)="toggleMobileMenu()"
         >
-          Colección Líneas
+          Lámparas de Mesa
+        </a>
+        <a
+          routerLink="/products"
+          [queryParams]="{ category: 'Lámparas de Velador' }"
+          class="mobile-nav-link"
+          (click)="toggleMobileMenu()"
+        >
+          Veladores
+        </a>
+        <a
+          routerLink="/products"
+          [queryParams]="{ category: 'Edición Limitada' }"
+          class="mobile-nav-link"
+          (click)="toggleMobileMenu()"
+        >
+          Edición Limitada
         </a>
         <a routerLink="/contact" class="mobile-nav-link" (click)="toggleMobileMenu()"> Contacto </a>
       </div>
