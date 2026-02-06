@@ -154,6 +154,13 @@ export class CheckoutPage {
         throw new Error('No se pudo iniciar el pago con Flow');
       }
 
+      // Save flow token and order ID to localStorage for callback verification
+      if (paymentResponse.token) {
+        localStorage.setItem('pending_flow_token', paymentResponse.token);
+        localStorage.setItem('pending_order_id', order.id.toString());
+        console.log('💾 Saved flow token to localStorage for callback verification');
+      }
+
       // 4. Redirect to Flow payment page
       window.location.href = paymentResponse.paymentUrl;
     } catch (error) {
