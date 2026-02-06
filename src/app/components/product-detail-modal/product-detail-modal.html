@@ -72,8 +72,38 @@
       <!-- Brand -->
       <span class="product-brand">Forja del Destino</span>
 
-      <!-- Title -->
-      <h2 class="product-title">{{ product.name }}</h2>
+      <!-- Title & Share -->
+      <div class="title-section">
+        <h2 class="product-title">{{ product.name }}</h2>
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="shareMenu"
+          class="share-btn"
+          aria-label="Compartir producto"
+        >
+          <mat-icon>share</mat-icon>
+        </button>
+      </div>
+
+      <!-- Share Menu -->
+      <mat-menu #shareMenu="matMenu">
+        <button mat-menu-item (click)="copyProductLink()">
+          <mat-icon>link</mat-icon>
+          <span>Copiar enlace</span>
+        </button>
+        <button mat-menu-item (click)="shareOnWhatsApp()">
+          <mat-icon>chat</mat-icon>
+          <span>WhatsApp</span>
+        </button>
+        <button mat-menu-item (click)="shareOnFacebook()">
+          <mat-icon>facebook</mat-icon>
+          <span>Facebook</span>
+        </button>
+        <button mat-menu-item (click)="shareOnTwitter()">
+          <mat-icon>X</mat-icon>
+          <span>X (Twitter)</span>
+        </button>
+      </mat-menu>
 
       <!-- Rating -->
       <div class="product-rating">

@@ -5,6 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatMenuModule } from '@angular/material/menu';
 import { Router } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { Product } from '../../models/product.model';
@@ -27,6 +29,8 @@ export interface ProductDetailData {
     MatIconModule,
     MatChipsModule,
     MatBadgeModule,
+    MatSnackBarModule,
+    MatMenuModule,
   ],
   templateUrl: './product-detail-modal.html',
   styleUrl: './product-detail-modal.scss',
@@ -35,6 +39,7 @@ export class ProductDetailModal {
   private dialogRef = inject(MatDialogRef<ProductDetailModal>);
   private cartService = inject(CartService);
   private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
 
   // Inject dialog data
   data = inject<ProductDetailData>(MAT_DIALOG_DATA);
@@ -163,6 +168,80 @@ export class ProductDetailModal {
   goToCart(): void {
     this.dialogRef.close();
     this.router.navigate(['/cart']);
+  }
+
+  // Share functionality
+  shareProduct(): void {
+    // Share button clicked - open menu handled in template
+  }
+
+  async copyProductLink(): Promise<void> {
+    const productUrl = `${window.location.origin}/products/${this.product.id}`;
+
+    try {
+      await navigator.clipboard.writeText(productUrl);
+      this.snackBar.open('Enlace copiado al portapapeles', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+      });
+    } catch {
+      // Fallback for older browsers
+      this.fallbackCopyToClipboard(productUrl);
+    }
+  }
+
+  private fallbackCopyToClipboard(text: string): void {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand('copy');
+      this.snackBar.open('Enlace copiado al portapapeles', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+      });
+    } catch {
+      this.snackBar.open('No se pudo copiar el enlace', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+      });
+    }
+    document.body.removeChild(textarea);
+  }
+
+  shareOnWhatsApp(): void {
+    const text = encodeURIComponent(
+      `¡Mira este producto increíble! ${this.product.name} - ${this.formatPrice(this.product.price)}`,
+    );
+    const url = encodeURIComponent(`${window.location.origin}/products/${this.product.id}`);
+    window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+  }
+
+  shareOnFacebook(): void {
+    const url = encodeURIComponent(`${window.location.origin}/products/${this.product.id}`);
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+      '_blank',
+      'width=600,height=400',
+    );
+  }
+
+  shareOnTwitter(): void {
+    const text = encodeURIComponent(
+      `¡Mira este producto increíble! ${this.product.name} - ${this.formatPrice(this.product.price)}`,
+    );
+    const url = encodeURIComponent(`${window.location.origin}/products/${this.product.id}`);
+    window.open(
+      `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
+      '_blank',
+      'width=600,height=400',
+    );
   }
 
   close(): void {
