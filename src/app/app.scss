@@ -8,6 +8,15 @@
   min-height: 100vh;
 }
 
+/* Prevenir CLS: reservar espacio para elementos dinámicos */
+.announcement-bar {
+  contain: layout;
+}
+
+.main-header {
+  contain: layout;
+}
+
 /* ========================================
    ANNOUNCEMENT BAR
    ======================================== */

@@ -64,6 +64,8 @@
                       [src]="item.product.image | optimizedImage: 100"
                       [alt]="item.product.name"
                       class="item-image"
+                      width="100"
+                      height="100"
                       loading="lazy"
                       decoding="async"
                       [attr.data-testid]="'cart-item-image-' + item.product.id"

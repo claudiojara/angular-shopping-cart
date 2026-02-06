@@ -143,6 +143,8 @@
                   sizes="(max-width: 480px) 200px, (max-width: 768px) 400px, 600px"
                   [alt]="product.name"
                   class="product-image"
+                  width="400"
+                  height="400"
                   [attr.fetchpriority]="product.id === 1 ? 'high' : 'auto'"
                   [loading]="product.id === 1 ? 'eager' : 'lazy'"
                   decoding="async"
