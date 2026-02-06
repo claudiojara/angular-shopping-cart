@@ -18,6 +18,8 @@ describe('CartService', () => {
     price: 99.99,
     image: 'https://test.com/image.jpg',
     category: 'Test',
+    rating: 4.0,
+    reviewCount: 3,
   };
 
   const mockDbCartItems = [

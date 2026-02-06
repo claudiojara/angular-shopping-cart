@@ -20,6 +20,8 @@ xdescribe('ProductList', () => {
       price: 100,
       image: 'https://test.com/1.jpg',
       category: 'Test',
+      rating: 4.5,
+      reviewCount: 5,
     },
     {
       id: 2,
@@ -28,6 +30,8 @@ xdescribe('ProductList', () => {
       price: 200,
       image: 'https://test.com/2.jpg',
       category: 'Test',
+      rating: 5.0,
+      reviewCount: 8,
     },
   ];
 

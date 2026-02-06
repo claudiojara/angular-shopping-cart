@@ -51,7 +51,7 @@ export class ProductService {
       price: 31016,
       originalPrice: 36490,
       image:
-        'https://images.unsplash.com/photo-1534349762913-96c606e55039?w=600&h=600&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1517991104123-1d56a6e81ed9?w=600&h=600&fit=crop&q=80',
       category: 'Lámparas de Mesa',
       rating: 5.0,
       reviewCount: 2,
@@ -83,7 +83,7 @@ export class ProductService {
       price: 29316,
       originalPrice: 34490,
       image:
-        'https://images.unsplash.com/photo-1540932296774-3ed6d23f9b58?w=600&h=600&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop&q=80',
       category: 'Lámparas de Mesa',
       rating: 5.0,
       reviewCount: 3,
@@ -127,7 +127,7 @@ export class ProductService {
       price: 25066,
       originalPrice: 29490,
       image:
-        'https://images.unsplash.com/photo-1534349762913-96c606e55039?w=600&h=600&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1517991104123-1d56a6e81ed9?w=600&h=600&fit=crop&q=80',
       category: 'Lámparas de Mesa',
       rating: 4.7,
       reviewCount: 8,
@@ -143,7 +143,7 @@ export class ProductService {
       price: 25066,
       originalPrice: 29490,
       image:
-        'https://images.unsplash.com/photo-1540932296774-3ed6d23f9b58?w=600&h=600&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop&q=80',
       category: 'Colección Malla',
       rating: 5.0,
       reviewCount: 5,

@@ -18,6 +18,8 @@ xdescribe('Cart', () => {
     price: 99.99,
     image: 'https://test.com/image.jpg',
     category: 'Test',
+    rating: 5.0,
+    reviewCount: 10,
   };
 
   const mockCartItems: CartItem[] = [{ product: mockProduct, quantity: 2 }];
