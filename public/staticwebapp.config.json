@@ -15,6 +15,11 @@
   },
   "routes": [
     {
+      "route": "/api/*",
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "allowedRoles": ["anonymous"]
+    },
+    {
       "route": "/products",
       "rewrite": "/index.html"
     },
