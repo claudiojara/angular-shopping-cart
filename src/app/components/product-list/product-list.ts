@@ -14,6 +14,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -43,6 +44,7 @@ type SortOption = 'featured' | 'price-asc' | 'price-desc' | 'rating';
     MatTooltipModule,
     MatSelectModule,
     MatFormFieldModule,
+    MatInputModule,
     MatExpansionModule,
     MatSliderModule,
     MatBadgeModule,
