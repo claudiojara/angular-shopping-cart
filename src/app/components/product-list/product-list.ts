@@ -137,12 +137,10 @@ export class ProductList implements OnInit {
   }
 
   formatPrice(price: number): string {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency: 'CLP',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
+    const formatted = Math.round(price)
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return `$${formatted}`;
   }
 
   setCategory(category: string): void {

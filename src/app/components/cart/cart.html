@@ -78,7 +78,7 @@
                         class="item-price"
                         [attr.data-testid]="'cart-item-price-' + item.product.id"
                       >
-                        {{ item.product.price | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
+                        {{ item.product.price | clpCurrency }}
                       </p>
 
                       <div class="quantity-controls">
@@ -116,10 +116,7 @@
                         class="item-subtotal"
                         [attr.data-testid]="'cart-item-subtotal-' + item.product.id"
                       >
-                        {{
-                          item.product.price * item.quantity
-                            | currency: 'CLP' : 'symbol-narrow' : '1.0-0'
-                        }}
+                        {{ item.product.price * item.quantity | clpCurrency }}
                       </p>
                       <button
                         mat-icon-button
@@ -142,7 +139,7 @@
               <div class="total-section">
                 <h2>Total</h2>
                 <h2 class="total-amount" data-testid="cart-total-amount">
-                  {{ total() | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
+                  {{ total() | clpCurrency }}
                 </h2>
               </div>
 

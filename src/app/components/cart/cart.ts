@@ -9,6 +9,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CartService } from '../../services/cart.service';
+import { ClpCurrencyPipe } from '../../pipes/clp-currency.pipe';
 
 @Component({
   selector: 'app-cart',
@@ -23,6 +24,7 @@ import { CartService } from '../../services/cart.service';
     MatDividerModule,
     MatBadgeModule,
     MatTooltipModule,
+    ClpCurrencyPipe,
   ],
   templateUrl: './cart.html',
   styleUrl: './cart.scss',
@@ -51,13 +53,10 @@ export class Cart {
   }
 
   checkout(): void {
-    const formattedTotal = new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency: 'CLP',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(this.total());
-    alert('¡Gracias por tu compra! Total: ' + formattedTotal);
+    const formattedTotal = Math.round(this.total())
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    alert('¡Gracias por tu compra! Total: $' + formattedTotal);
     this.clearCart();
   }
 }
