@@ -18,6 +18,33 @@
             En el carrito ({{ getCartQuantity() }})
           </span>
         }
+
+        <!-- Navigation Arrows (only if multiple images) -->
+        @if (canNavigate()) {
+          <button
+            mat-icon-button
+            class="nav-arrow prev-arrow"
+            (click)="previousImage()"
+            aria-label="Imagen anterior"
+          >
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+
+          <button
+            mat-icon-button
+            class="nav-arrow next-arrow"
+            (click)="nextImage()"
+            aria-label="Imagen siguiente"
+          >
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+
+          <!-- Image counter -->
+          <div class="image-counter">
+            {{ currentImageIndex() + 1 }} / {{ galleryImages.length }}
+          </div>
+        }
+
         <img [src]="selectedImage()" [alt]="product.name" class="product-image" />
       </div>
 

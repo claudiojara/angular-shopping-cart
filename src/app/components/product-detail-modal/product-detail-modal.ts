@@ -1,4 +1,4 @@
-import { Component, inject, signal, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -41,6 +41,7 @@ export class ProductDetailModal {
 
   product = this.data.product;
   selectedImage = signal<string>(this.product.image);
+  currentImageIndex = signal<number>(0);
 
   // Gallery images (including primary)
   galleryImages = this.product.images || [];
@@ -81,6 +82,49 @@ export class ProductDetailModal {
 
   selectImage(imageUrl: string): void {
     this.selectedImage.set(imageUrl);
+    const index = this.galleryImages.findIndex((img) => img.image_url === imageUrl);
+    if (index !== -1) {
+      this.currentImageIndex.set(index);
+    }
+  }
+
+  nextImage(): void {
+    if (!this.hasGallery) return;
+    const nextIndex = (this.currentImageIndex() + 1) % this.galleryImages.length;
+    this.currentImageIndex.set(nextIndex);
+    this.selectedImage.set(this.galleryImages[nextIndex].image_url);
+  }
+
+  previousImage(): void {
+    if (!this.hasGallery) return;
+    const prevIndex =
+      (this.currentImageIndex() - 1 + this.galleryImages.length) % this.galleryImages.length;
+    this.currentImageIndex.set(prevIndex);
+    this.selectedImage.set(this.galleryImages[prevIndex].image_url);
+  }
+
+  canNavigate(): boolean {
+    return this.hasGallery;
+  }
+
+  // Keyboard navigation
+  @HostListener('window:keydown', ['$event'])
+  handleKeyboard(event: KeyboardEvent): void {
+    if (!this.canNavigate()) return;
+
+    switch (event.key) {
+      case 'ArrowLeft':
+        event.preventDefault();
+        this.previousImage();
+        break;
+      case 'ArrowRight':
+        event.preventDefault();
+        this.nextImage();
+        break;
+      case 'Escape':
+        this.close();
+        break;
+    }
   }
 
   addToCart(): void {
