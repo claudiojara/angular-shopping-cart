@@ -49,6 +49,7 @@ export class ProductDetailModal {
 
   // Cart state
   cartItems = this.cartService.items;
+  quantity = signal<number>(1); // Quantity selector
 
   // Check if product is in cart
   isInCart = () => {
@@ -127,8 +128,36 @@ export class ProductDetailModal {
     }
   }
 
+  // Quantity controls
+  increaseQuantity(): void {
+    const maxStock = this.product.stockQuantity ?? 99;
+    if (this.quantity() < maxStock) {
+      this.quantity.update((q) => q + 1);
+    }
+  }
+
+  decreaseQuantity(): void {
+    if (this.quantity() > 1) {
+      this.quantity.update((q) => q - 1);
+    }
+  }
+
+  canIncrease(): boolean {
+    const maxStock = this.product.stockQuantity ?? 99;
+    return this.quantity() < maxStock;
+  }
+
+  canDecrease(): boolean {
+    return this.quantity() > 1;
+  }
+
   addToCart(): void {
-    this.cartService.addToCart(this.product);
+    const qty = this.quantity();
+    for (let i = 0; i < qty; i++) {
+      this.cartService.addToCart(this.product);
+    }
+    // Reset quantity after adding
+    this.quantity.set(1);
   }
 
   goToCart(): void {

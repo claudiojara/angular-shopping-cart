@@ -158,6 +158,32 @@
         </div>
       }
 
+      <!-- Quantity Selector -->
+      @if (!isInCart() && product.stockQuantity > 0) {
+        <div class="quantity-selector">
+          <label>Cantidad:</label>
+          <div class="quantity-controls">
+            <button
+              mat-icon-button
+              (click)="decreaseQuantity()"
+              [disabled]="!canDecrease()"
+              aria-label="Disminuir cantidad"
+            >
+              <mat-icon>remove</mat-icon>
+            </button>
+            <span class="quantity-display">{{ quantity() }}</span>
+            <button
+              mat-icon-button
+              (click)="increaseQuantity()"
+              [disabled]="!canIncrease()"
+              aria-label="Aumentar cantidad"
+            >
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+
       <!-- Actions -->
       <div class="modal-actions">
         @if (!isInCart()) {
