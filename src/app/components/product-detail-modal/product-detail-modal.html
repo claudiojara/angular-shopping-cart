@@ -21,9 +21,23 @@
         <img [src]="selectedImage()" [alt]="product.name" class="product-image" />
       </div>
 
-      <!-- Thumbnail Gallery (if multiple images exist) -->
-      <!-- Note: Currently products only have one image, so this is hidden -->
-      <!-- In the future, when products have multiple images, show them here -->
+      <!-- Thumbnail Gallery -->
+      @if (hasGallery) {
+        <div class="thumbnail-gallery">
+          @for (img of galleryImages; track img.image_url) {
+            <div
+              class="thumbnail"
+              [class.active]="selectedImage() === img.image_url"
+              (click)="selectImage(img.image_url)"
+              role="button"
+              tabindex="0"
+              [attr.aria-label]="img.alt_text || 'Vista de producto'"
+            >
+              <img [src]="img.image_url" [alt]="img.alt_text || product.name" />
+            </div>
+          }
+        </div>
+      }
     </div>
 
     <!-- Right: Details -->

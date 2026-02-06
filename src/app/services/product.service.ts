@@ -342,6 +342,7 @@ export class ProductService {
       price: dbProduct.price,
       originalPrice: dbProduct.original_price ?? undefined,
       image: imageUrl,
+      images: dbProduct.images.length > 0 ? dbProduct.images : undefined, // Gallery images
       category: categoryName,
       rating: dbProduct.average_rating,
       reviewCount: dbProduct.review_count,

@@ -42,6 +42,10 @@ export class ProductDetailModal {
   product = this.data.product;
   selectedImage = signal<string>(this.product.image);
 
+  // Gallery images (including primary)
+  galleryImages = this.product.images || [];
+  hasGallery = this.galleryImages.length > 1;
+
   // Cart state
   cartItems = this.cartService.items;
 
@@ -73,6 +77,10 @@ export class ProductDetailModal {
 
   calculateDiscount(originalPrice: number, currentPrice: number): number {
     return Math.round((1 - currentPrice / originalPrice) * 100);
+  }
+
+  selectImage(imageUrl: string): void {
+    this.selectedImage.set(imageUrl);
   }
 
   addToCart(): void {

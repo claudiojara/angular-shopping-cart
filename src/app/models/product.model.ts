@@ -10,6 +10,7 @@ export interface Product {
   price: number;
   originalPrice?: number;
   image: string;
+  images?: ProductImage[]; // Gallery images from database
   category: string;
   rating: number;
   reviewCount: number;
@@ -20,6 +21,15 @@ export interface Product {
   stockQuantity?: number;
   isAvailable?: boolean;
   isFeatured?: boolean;
+}
+
+/**
+ * Product image from gallery
+ */
+export interface ProductImage {
+  image_url: string;
+  alt_text: string | null;
+  is_primary: boolean;
 }
 
 /**
