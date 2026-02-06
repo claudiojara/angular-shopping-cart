@@ -1,73 +1,182 @@
-<mat-toolbar color="primary" class="app-toolbar">
-  <mat-toolbar-row>
-    <button
-      mat-button
-      routerLink="/"
-      routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
-      data-testid="navbar-home-button"
-    >
-      <mat-icon>store</mat-icon>
-      <span>TiendApp</span>
-    </button>
+<div class="app-layout">
+  <!-- Skip link for accessibility -->
+  <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
 
-    <span class="spacer"></span>
+  <!-- Announcement Bar -->
+  <div class="announcement-bar" role="banner">
+    <div class="container">
+      <p class="announcement-text">
+        <mat-icon class="announcement-icon">local_shipping</mat-icon>
+        ¡Despacho <strong>GRATIS</strong> por compras sobre $45.000 a todo Chile!
+      </p>
+    </div>
+  </div>
 
-    <button
-      mat-button
-      routerLink="/products"
-      routerLinkActive="active"
-      data-testid="navbar-products-button"
-    >
-      <mat-icon>inventory_2</mat-icon>
-      <span>Productos</span>
-    </button>
+  <!-- Main Header -->
+  <header class="main-header" role="banner">
+    <div class="container">
+      <div class="header-content">
+        <!-- Logo -->
+        <a
+          routerLink="/"
+          class="logo-link"
+          data-testid="navbar-home-button"
+          aria-label="Ir a la página de inicio"
+        >
+          <img
+            src="assets/logo.svg"
+            alt="Lumina - Lámparas de Diseño"
+            class="logo-image"
+            width="120"
+            height="40"
+          />
+        </a>
 
-    <button
-      mat-button
-      routerLink="/cart"
-      routerLinkActive="active"
-      data-testid="navbar-cart-button"
-    >
-      <mat-icon
-        [matBadge]="cartItemCount()"
-        [matBadgeHidden]="cartItemCount() === 0"
-        matBadgeColor="accent"
-        data-testid="cart-badge"
-      >
-        shopping_cart
-      </mat-icon>
-      <span>Carrito</span>
-    </button>
+        <!-- Desktop Navigation -->
+        <nav class="main-nav" role="navigation" aria-label="Navegación principal">
+          <a
+            routerLink="/products"
+            routerLinkActive="active"
+            class="nav-link"
+            data-testid="navbar-products-button"
+          >
+            Lámparas
+          </a>
+          <a
+            routerLink="/products"
+            [queryParams]="{ category: 'Colección Malla' }"
+            class="nav-link"
+          >
+            Colección Malla
+          </a>
+          <a
+            routerLink="/products"
+            [queryParams]="{ category: 'Colección Líneas' }"
+            class="nav-link"
+          >
+            Colección Líneas
+          </a>
+          <a routerLink="/contact" class="nav-link">Contacto</a>
+        </nav>
 
-    @if (currentUser | async; as user) {
-      <button mat-icon-button [matMenuTriggerFor]="userMenu" data-testid="user-menu-button">
-        <mat-icon>account_circle</mat-icon>
-      </button>
-      <mat-menu #userMenu="matMenu">
-        <div class="user-menu-header">
-          <mat-icon>email</mat-icon>
-          <span data-testid="user-menu-email">{{ user.email }}</span>
+        <!-- Header Actions -->
+        <div class="header-actions">
+          <!-- Search button -->
+          <button mat-icon-button class="action-btn" aria-label="Buscar productos">
+            <mat-icon>search</mat-icon>
+          </button>
+
+          <!-- User menu -->
+          @if (currentUser | async; as user) {
+            <button
+              mat-icon-button
+              [matMenuTriggerFor]="userMenu"
+              class="action-btn"
+              data-testid="user-menu-button"
+              aria-label="Menú de usuario"
+            >
+              <mat-icon>account_circle</mat-icon>
+            </button>
+            <mat-menu #userMenu="matMenu" class="user-menu">
+              <div class="user-menu-header">
+                <mat-icon>email</mat-icon>
+                <span data-testid="user-menu-email">{{ user.email }}</span>
+              </div>
+              <mat-divider></mat-divider>
+              <button mat-menu-item (click)="logout()" data-testid="logout-button">
+                <mat-icon>logout</mat-icon>
+                <span>Cerrar Sesión</span>
+              </button>
+            </mat-menu>
+          } @else {
+            <a
+              routerLink="/login"
+              class="action-btn"
+              data-testid="navbar-login-button"
+              aria-label="Iniciar sesión"
+            >
+              <mat-icon>person</mat-icon>
+            </a>
+          }
+
+          <!-- Cart button -->
+          <a
+            routerLink="/cart"
+            class="action-btn cart-btn"
+            routerLinkActive="active"
+            data-testid="navbar-cart-button"
+            aria-label="Ver carrito de compras"
+          >
+            <mat-icon
+              [matBadge]="cartItemCount()"
+              [matBadgeHidden]="cartItemCount() === 0"
+              matBadgeColor="accent"
+              matBadgeSize="small"
+              data-testid="cart-badge"
+            >
+              shopping_cart
+            </mat-icon>
+          </a>
+
+          <!-- Mobile menu button -->
+          <button
+            mat-icon-button
+            class="action-btn mobile-menu-btn"
+            (click)="toggleMobileMenu()"
+            aria-label="Abrir menú"
+            aria-expanded="false"
+          >
+            <mat-icon>{{ isMobileMenuOpen() ? 'close' : 'menu' }}</mat-icon>
+          </button>
         </div>
-        <button mat-menu-item (click)="logout()" data-testid="logout-button">
-          <mat-icon>logout</mat-icon>
-          <span>Cerrar Sesión</span>
-        </button>
-      </mat-menu>
-    } @else {
-      <button
-        mat-button
-        routerLink="/login"
-        routerLinkActive="active"
-        data-testid="navbar-login-button"
-      >
-        <mat-icon>login</mat-icon>
-        <span>Iniciar Sesión</span>
-      </button>
-    }
-  </mat-toolbar-row>
-</mat-toolbar>
+      </div>
+    </div>
+  </header>
 
-<main class="app-content">
-  <router-outlet />
-</main>
+  <!-- Mobile Navigation Drawer -->
+  @if (isMobileMenuOpen()) {
+    <div
+      class="mobile-menu-overlay"
+      (click)="toggleMobileMenu()"
+      role="button"
+      tabindex="0"
+      aria-label="Cerrar menú"
+    ></div>
+    <nav class="mobile-menu" role="navigation" aria-label="Navegación móvil">
+      <div class="mobile-menu-header">
+        <img src="assets/logo.svg" alt="Lumina" class="mobile-logo" width="100" height="35" />
+        <button mat-icon-button (click)="toggleMobileMenu()" aria-label="Cerrar menú">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="mobile-menu-links">
+        <a routerLink="/products" class="mobile-nav-link" (click)="toggleMobileMenu()">
+          Lámparas
+        </a>
+        <a
+          routerLink="/products"
+          [queryParams]="{ category: 'Colección Malla' }"
+          class="mobile-nav-link"
+          (click)="toggleMobileMenu()"
+        >
+          Colección Malla
+        </a>
+        <a
+          routerLink="/products"
+          [queryParams]="{ category: 'Colección Líneas' }"
+          class="mobile-nav-link"
+          (click)="toggleMobileMenu()"
+        >
+          Colección Líneas
+        </a>
+        <a routerLink="/contact" class="mobile-nav-link" (click)="toggleMobileMenu()"> Contacto </a>
+      </div>
+    </nav>
+  }
+
+  <!-- Main Content -->
+  <main id="main-content" class="app-content" role="main">
+    <router-outlet />
+  </main>
+</div>
