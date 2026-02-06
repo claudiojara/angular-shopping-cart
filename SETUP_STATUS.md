@@ -198,7 +198,7 @@ Fecha: 12/25
 1. **Verificar logs de Edge Function:**
 
    ```bash
-   export SUPABASE_ACCESS_TOKEN="sbp_737db4b830facf7b75085b1bd3acfce2966cad98"
+   export SUPABASE_ACCESS_TOKEN="<YOUR_SUPABASE_ACCESS_TOKEN>"
    supabase functions logs create-flow-payment --tail
    ```
 

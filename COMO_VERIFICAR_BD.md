@@ -81,7 +81,7 @@ console.log('\n✅ Si ves valores reales (no undefined), ¡vienen de la BD!');
 2. **Headers de la request:**
 
    ```
-   apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   apikey: <YOUR_SUPABASE_PUBLISHABLE_KEY>
    ```
 
 3. **Response body (JSON):**

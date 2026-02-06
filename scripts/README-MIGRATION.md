@@ -40,8 +40,8 @@ Ensure you have Supabase credentials configured:
 {
   "supabase": {
     "url": "https://owewtzddyykyraxkkorx.supabase.co",
-    "anonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "serviceRoleKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    "anonKey": "<YOUR_SUPABASE_PUBLISHABLE_KEY>",
+    "serviceRoleKey": "<YOUR_SUPABASE_SECRET_KEY>"
   }
 }
 ```
@@ -50,8 +50,8 @@ Ensure you have Supabase credentials configured:
 
 ```bash
 export SUPABASE_URL="https://owewtzddyykyraxkkorx.supabase.co"
-export SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-export SUPABASE_SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+export SUPABASE_KEY="<YOUR_SUPABASE_PUBLISHABLE_KEY>"
+export SUPABASE_SERVICE_ROLE_KEY="<YOUR_SUPABASE_SECRET_KEY>"
 ```
 
 ### 2. Node.js Dependencies
@@ -667,7 +667,7 @@ Then revert Angular code changes.
   "supabase": {
     "url": "...",
     "anonKey": "...",
-    "serviceRoleKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    "serviceRoleKey": "<YOUR_SUPABASE_SECRET_KEY>"
   }
 }
 ```

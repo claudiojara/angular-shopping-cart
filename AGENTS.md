@@ -415,7 +415,7 @@ npx ts-node e2e/setup-test-users.ts
 # Check Supabase configuration
 # Ensure .env or environment variables match:
 SUPABASE_URL=https://owewtzddyykyraxkkorx.supabase.co
-SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+SUPABASE_KEY=<YOUR_SUPABASE_PUBLISHABLE_KEY>
 ```
 
 #### Issue: Cart items from previous test appear

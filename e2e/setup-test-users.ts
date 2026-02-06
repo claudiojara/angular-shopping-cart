@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 
 /**
  * Script para verificar y crear usuarios de prueba en Supabase
- * 
+ *
  * Ejecutar: node e2e/setup-test-users.js (después de compilar)
  */
 
@@ -10,17 +10,17 @@ const TEST_USERS = {
   user1: {
     email: 'playwright-test@example.com',
     password: 'PlaywrightTest123!',
-    name: 'Test User 1'
+    name: 'Test User 1',
   },
   user2: {
     email: 'playwright-test2@example.com',
     password: 'PlaywrightTest123!',
-    name: 'Test User 2'
-  }
+    name: 'Test User 2',
+  },
 };
 
 const SUPABASE_URL = 'https://owewtzddyykyraxkkorx.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93ZXd0emRkeXlreXJheGtrb3J4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNDE3MTcsImV4cCI6MjA4NTgxNzcxN30.E5M6cIwnJTt1Y04pApmvLNqpV5yQSOcNJHlCM_JDBRE';
+const SUPABASE_ANON_KEY = 'sb_publishable_XbmBRik7ryFTq_-LJ2NLRw_3RaJGDz4';
 
 async function setupTestUsers() {
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -34,14 +34,14 @@ async function setupTestUsers() {
       // Intentar hacer login para verificar si existe
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: user.email,
-        password: user.password
+        password: user.password,
       });
 
       if (signInData.user) {
         console.log(`   ✅ User exists and can login`);
         console.log(`   📍 User ID: ${signInData.user.id}`);
         console.log(`   📧 Email confirmed: ${signInData.user.email_confirmed_at ? 'Yes' : 'No'}`);
-        
+
         // Logout después de verificar
         await supabase.auth.signOut();
       } else if (signInError) {
@@ -62,7 +62,7 @@ async function setupTestUsers() {
   console.log('   - Both users MUST exist in Supabase');
   console.log('   - Email confirmation MUST be disabled');
   console.log('   - RLS policies MUST allow user-specific cart access');
-  console.log('\n✨ If users don\'t exist, create them in Supabase Dashboard:');
+  console.log("\n✨ If users don't exist, create them in Supabase Dashboard:");
   console.log('   Dashboard → Authentication → Users → Add User\n');
 }
 

@@ -153,14 +153,14 @@ WHERE oi.order_id = 1;
 **Terminal 1 - Logs de create-flow-payment:**
 
 ```bash
-export SUPABASE_ACCESS_TOKEN="sbp_737db4b830facf7b75085b1bd3acfce2966cad98"
+export SUPABASE_ACCESS_TOKEN="<YOUR_SUPABASE_ACCESS_TOKEN>"
 supabase functions logs create-flow-payment --tail
 ```
 
 **Terminal 2 - Logs de webhook:**
 
 ```bash
-export SUPABASE_ACCESS_TOKEN="sbp_737db4b830facf7b75085b1bd3acfce2966cad98"
+export SUPABASE_ACCESS_TOKEN="<YOUR_SUPABASE_ACCESS_TOKEN>"
 supabase functions logs flow-webhook --tail
 ```
 
@@ -243,7 +243,7 @@ Abre las DevTools (F12) y revisa:
 Una vez que compruebes que funciona, **DEBES cambiar el FLOW_RETURN_URL** de vuelta a producción:
 
 ```bash
-export SUPABASE_ACCESS_TOKEN="sbp_737db4b830facf7b75085b1bd3acfce2966cad98"
+export SUPABASE_ACCESS_TOKEN="<YOUR_SUPABASE_ACCESS_TOKEN>"
 supabase secrets set FLOW_RETURN_URL='https://witty-bush-0d65a3d0f.2.azurestaticapps.net/payment/callback'
 ```
 

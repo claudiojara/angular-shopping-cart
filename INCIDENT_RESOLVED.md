@@ -61,7 +61,7 @@
 ### Old System (JWT-based, EXPOSED)
 
 ```
-Format: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Format: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... (JWT token - DEPRECATED)
 Type: service_role JWT
 Status: ❌ REVOKED
 Exposed in: Commits f69b4ea, ed31138

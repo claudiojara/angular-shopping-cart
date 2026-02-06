@@ -174,7 +174,7 @@ LIMIT 5;
 ```bash
 # Obtener último flow_token de una orden
 TOKEN=$(curl -s 'https://owewtzddyykyraxkkorx.supabase.co/rest/v1/orders?select=flow_token&order=created_at.desc&limit=1' \
-  -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
+  -H "apikey: <YOUR_SUPABASE_PUBLISHABLE_KEY>" \
   | jq -r '.[0].flow_token')
 
 # Simular webhook de Flow
