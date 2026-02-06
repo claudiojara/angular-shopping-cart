@@ -72,8 +72,8 @@
                 <input
                   matInput
                   type="number"
-                  [(ngModel)]="priceRange().min"
-                  (ngModelChange)="priceRange.set({ ...priceRange(), min: $event })"
+                  [ngModel]="priceRange().min"
+                  (ngModelChange)="updatePriceMin($event)"
                 />
               </mat-form-field>
               <span class="price-separator">-</span>
@@ -82,8 +82,8 @@
                 <input
                   matInput
                   type="number"
-                  [(ngModel)]="priceRange().max"
-                  (ngModelChange)="priceRange.set({ ...priceRange(), max: $event })"
+                  [ngModel]="priceRange().max"
+                  (ngModelChange)="updatePriceMax($event)"
                 />
               </mat-form-field>
             </div>

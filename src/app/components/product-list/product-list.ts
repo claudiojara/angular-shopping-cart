@@ -124,6 +124,14 @@ export class ProductList {
     this.selectedCategory.set(category);
   }
 
+  updatePriceMin(value: number): void {
+    this.priceRange.update((range) => ({ ...range, min: value }));
+  }
+
+  updatePriceMax(value: number): void {
+    this.priceRange.update((range) => ({ ...range, max: value }));
+  }
+
   clearFilters(): void {
     this.selectedCategory.set('');
     this.priceRange.set({ min: 0, max: 50000 });
