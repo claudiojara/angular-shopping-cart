@@ -1,4 +1,11 @@
-import { Component, inject, ChangeDetectionStrategy, signal, computed } from '@angular/core';
+import {
+  Component,
+  inject,
+  ChangeDetectionStrategy,
+  signal,
+  computed,
+  OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,6 +18,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatBadgeModule } from '@angular/material/badge';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { SeoService } from '../../services/seo.service';
@@ -42,10 +50,12 @@ type SortOption = 'featured' | 'price-asc' | 'price-desc' | 'rating';
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',
 })
-export class ProductList {
+export class ProductList implements OnInit {
   private productService = inject(ProductService);
   private cartService = inject(CartService);
   private seoService = inject(SeoService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   // State signals
   selectedCategory = signal<string>('');
@@ -63,6 +73,16 @@ export class ProductList {
       description:
         'Descubre nuestra colección de lámparas de diseño minimalista impresas en 3D. Veladores, lámparas de mesa y más. Envío gratis en compras sobre $45.000.',
       type: 'website',
+    });
+  }
+
+  ngOnInit(): void {
+    // Read query params and apply category filter
+    this.route.queryParams.subscribe((params) => {
+      const category = params['category'];
+      if (category) {
+        this.selectedCategory.set(category);
+      }
     });
   }
 
@@ -122,6 +142,20 @@ export class ProductList {
 
   setCategory(category: string): void {
     this.selectedCategory.set(category);
+    // Update URL to reflect selected category
+    if (category) {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { category },
+        queryParamsHandling: 'merge',
+      });
+    } else {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { category: null },
+        queryParamsHandling: 'merge',
+      });
+    }
   }
 
   updatePriceMin(value: number): void {
@@ -136,5 +170,10 @@ export class ProductList {
     this.selectedCategory.set('');
     this.priceRange.set({ min: 0, max: 50000 });
     this.sortBy.set('featured');
+    // Clear URL query params
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {},
+    });
   }
 }
