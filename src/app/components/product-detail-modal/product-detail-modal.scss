@@ -471,6 +471,48 @@
   }
 }
 
+.product-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-top: var(--spacing-sm);
+
+  .benefit-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+
+    .benefit-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .benefit-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--color-text-primary);
+      }
+
+      .benefit-subtitle {
+        font-size: 13px;
+        color: var(--color-text-secondary);
+      }
+    }
+  }
+}
+
 .modal-actions {
   display: flex;
   gap: var(--spacing-sm);
@@ -562,6 +604,21 @@
       .quantity-display {
         min-width: 60px;
         font-size: 18px;
+      }
+    }
+  }
+
+  .product-benefits {
+    padding: var(--spacing-md);
+    gap: var(--spacing-sm);
+
+    .benefit-item {
+      gap: var(--spacing-sm);
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
       }
     }
   }
