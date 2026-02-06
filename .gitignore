@@ -53,6 +53,9 @@ __screenshots__/
 /src/assets/config.local.json
 /public/config.local.json
 
+# Azure Functions local settings
+/api/local.settings.json
+
 # System files
 .DS_Store
 Thumbs.db
