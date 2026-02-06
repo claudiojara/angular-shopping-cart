@@ -57,7 +57,7 @@ type SortOption = 'featured' | 'price-asc' | 'price-desc' | 'rating';
   styleUrl: './product-list.scss',
 })
 export class ProductList implements OnInit {
-  private productService = inject(ProductService);
+  productService = inject(ProductService);
   private cartService = inject(CartService);
   private seoService = inject(SeoService);
   private route = inject(ActivatedRoute);
@@ -68,9 +68,11 @@ export class ProductList implements OnInit {
   sortBy = signal<SortOption>('featured');
   priceRange = signal<{ min: number; max: number }>({ min: 0, max: 50000 });
 
-  // Data
-  products = this.productService.getProducts;
-  categories = this.productService.getCategories();
+  // Data from service
+  products = this.productService.products;
+  categories = this.productService.categories;
+  loading = this.productService.loading;
+  error = this.productService.error;
 
   constructor() {
     // Set SEO for products page
@@ -182,5 +184,13 @@ export class ProductList implements OnInit {
       relativeTo: this.route,
       queryParams: {},
     });
+  }
+
+  /**
+   * Reload products from database
+   * Útil para desarrollo/debugging cuando cambias datos en Supabase
+   */
+  async refreshProducts(): Promise<void> {
+    await this.productService.loadProducts();
   }
 }

@@ -53,7 +53,7 @@
             >
               Todas las categorías
             </button>
-            @for (category of categories; track category) {
+            @for (category of categories(); track category) {
               <button
                 mat-button
                 class="filter-option"
@@ -99,128 +99,153 @@
 
       <!-- Products Grid -->
       <main class="products-content">
-        <!-- Toolbar -->
-        <div class="products-toolbar">
-          <span class="results-count"> {{ productCount() }} productos </span>
+        <!-- Loading State -->
+        @if (loading()) {
+          <div class="loading-state">
+            <mat-icon class="loading-icon">hourglass_empty</mat-icon>
+            <h3>Cargando productos...</h3>
+            <p>Por favor espera un momento.</p>
+          </div>
+        }
 
-          <mat-form-field appearance="outline" class="sort-select">
-            <mat-label>Ordenar por</mat-label>
-            <mat-select [(value)]="sortBy">
-              <mat-option value="featured">Destacados</mat-option>
-              <mat-option value="price-asc">Precio: menor a mayor</mat-option>
-              <mat-option value="price-desc">Precio: mayor a menor</mat-option>
-              <mat-option value="rating">Mejor valorados</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-
-        <!-- Empty State -->
-        @if (productCount() === 0) {
-          <div class="empty-state">
-            <mat-icon class="empty-icon">search_off</mat-icon>
-            <h3>No se encontraron productos</h3>
-            <p>Intenta ajustar los filtros para ver más resultados.</p>
-            <button mat-raised-button color="primary" (click)="clearFilters()">
-              Limpiar filtros
+        <!-- Error State -->
+        @else if (error()) {
+          <div class="error-state">
+            <mat-icon class="error-icon">error_outline</mat-icon>
+            <h3>Error al cargar productos</h3>
+            <p>{{ error() }}</p>
+            <button mat-raised-button color="primary" (click)="productService.loadProducts()">
+              Reintentar
             </button>
           </div>
         }
 
-        <!-- Product Grid -->
-        <div class="product-grid" data-testid="product-grid">
-          @for (product of filteredProducts(); track product.id) {
-            <mat-card class="product-card" [attr.data-testid]="'product-card-' + product.id">
-              <!-- Badge -->
-              @if (product.badge) {
-                <span class="product-badge">{{ product.badge }}</span>
-              }
+        <!-- Products Content -->
+        @else {
+          <!-- Toolbar -->
+          <div class="products-toolbar">
+            <span class="results-count"> {{ productCount() }} productos </span>
 
-              <!-- Image -->
-              <div class="product-image-wrapper">
-                <img
-                  [src]="product.image | optimizedImage: 400"
-                  [srcset]="product.image | srcSet"
-                  sizes="(max-width: 480px) 200px, (max-width: 768px) 400px, 600px"
-                  [alt]="product.name"
-                  class="product-image"
-                  width="400"
-                  height="400"
-                  [attr.fetchpriority]="product.id === 1 ? 'high' : 'auto'"
-                  [loading]="product.id === 1 ? 'eager' : 'lazy'"
-                  decoding="async"
-                  [attr.data-testid]="'product-image-' + product.id"
-                />
-              </div>
+            <mat-form-field appearance="outline" class="sort-select">
+              <mat-label>Ordenar por</mat-label>
+              <mat-select [(value)]="sortBy">
+                <mat-option value="featured">Destacados</mat-option>
+                <mat-option value="price-asc">Precio: menor a mayor</mat-option>
+                <mat-option value="price-desc">Precio: mayor a menor</mat-option>
+                <mat-option value="rating">Mejor valorados</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
 
-              <!-- Content -->
-              <mat-card-content class="product-content">
-                <!-- Rating -->
-                <div class="product-rating">
-                  <div class="stars">
-                    @for (star of getStarsArray(product.rating); track star) {
-                      <mat-icon
-                        class="star-icon"
-                        [class.filled]="star <= product.rating"
-                        [class.half]="star > product.rating && star - 0.5 <= product.rating"
-                      >
-                        {{
-                          star <= product.rating
-                            ? 'star'
-                            : star - 0.5 <= product.rating
-                              ? 'star_half'
-                              : 'star_border'
-                        }}
-                      </mat-icon>
-                    }
-                  </div>
-                  <span class="review-count">({{ product.reviewCount }} reseñas)</span>
-                </div>
-
-                <!-- Brand -->
-                <span class="product-brand">Forja del Destino</span>
-
-                <!-- Name -->
-                <h3 class="product-name" [attr.data-testid]="'product-name-' + product.id">
-                  {{ product.name }}
-                </h3>
-
-                <!-- Prices -->
-                <div class="product-prices">
-                  @if (product.originalPrice) {
-                    <span class="original-price"> {{ formatPrice(product.originalPrice) }} </span>
-                  }
-                  <span class="current-price" [attr.data-testid]="'product-price-' + product.id">
-                    {{ formatPrice(product.price) }}
-                  </span>
-                </div>
-
-                <!-- Variants -->
-                @if (product.variants && product.variants.length > 0) {
-                  <div class="product-variants">
-                    @for (variant of product.variants; track variant) {
-                      <span class="variant-badge">{{ variant }}</span>
-                    }
-                  </div>
-                }
-              </mat-card-content>
-
-              <!-- Actions -->
-              <mat-card-actions class="product-actions">
-                <button
-                  mat-raised-button
-                  color="primary"
-                  (click)="addToCart(product)"
-                  class="add-to-cart-btn"
-                  [attr.data-testid]="'add-to-cart-' + product.id"
-                  [matTooltip]="'Agregar ' + product.name + ' al carrito'"
-                >
-                  <mat-icon>add_shopping_cart</mat-icon>
-                  Agregar al Carrito
-                </button>
-              </mat-card-actions>
-            </mat-card>
+          <!-- Empty State -->
+          @if (productCount() === 0) {
+            <div class="empty-state">
+              <mat-icon class="empty-icon">search_off</mat-icon>
+              <h3>No se encontraron productos</h3>
+              <p>Intenta ajustar los filtros para ver más resultados.</p>
+              <button mat-raised-button color="primary" (click)="clearFilters()">
+                Limpiar filtros
+              </button>
+            </div>
           }
-        </div>
+
+          <!-- Product Grid -->
+          <div class="product-grid" data-testid="product-grid">
+            @for (product of filteredProducts(); track product.id) {
+              <mat-card class="product-card" [attr.data-testid]="'product-card-' + product.id">
+                <!-- Badge -->
+                @if (product.badge) {
+                  <span class="product-badge">{{ product.badge }}</span>
+                }
+
+                <!-- Image -->
+                <div class="product-image-wrapper">
+                  <img
+                    [src]="product.image | optimizedImage: 400"
+                    [srcset]="product.image | srcSet"
+                    sizes="(max-width: 480px) 200px, (max-width: 768px) 400px, 600px"
+                    [alt]="product.name"
+                    class="product-image"
+                    width="400"
+                    height="400"
+                    [attr.fetchpriority]="product.id === 1 ? 'high' : 'auto'"
+                    [loading]="product.id === 1 ? 'eager' : 'lazy'"
+                    decoding="async"
+                    [attr.data-testid]="'product-image-' + product.id"
+                  />
+                </div>
+
+                <!-- Content -->
+                <mat-card-content class="product-content">
+                  <!-- Rating -->
+                  <div class="product-rating">
+                    <div class="stars">
+                      @for (star of getStarsArray(product.rating); track star) {
+                        <mat-icon
+                          class="star-icon"
+                          [class.filled]="star <= product.rating"
+                          [class.half]="star > product.rating && star - 0.5 <= product.rating"
+                        >
+                          {{
+                            star <= product.rating
+                              ? 'star'
+                              : star - 0.5 <= product.rating
+                                ? 'star_half'
+                                : 'star_border'
+                          }}
+                        </mat-icon>
+                      }
+                    </div>
+                    <span class="review-count">({{ product.reviewCount }} reseñas)</span>
+                  </div>
+
+                  <!-- Brand -->
+                  <span class="product-brand">Forja del Destino</span>
+
+                  <!-- Name -->
+                  <h3 class="product-name" [attr.data-testid]="'product-name-' + product.id">
+                    {{ product.name }}
+                  </h3>
+
+                  <!-- Prices -->
+                  <div class="product-prices">
+                    @if (product.originalPrice) {
+                      <span class="original-price"> {{ formatPrice(product.originalPrice) }} </span>
+                    }
+                    <span class="current-price" [attr.data-testid]="'product-price-' + product.id">
+                      {{ formatPrice(product.price) }}
+                    </span>
+                  </div>
+
+                  <!-- Variants -->
+                  @if (product.variants && product.variants.length > 0) {
+                    <div class="product-variants">
+                      @for (variant of product.variants; track variant) {
+                        <span class="variant-badge">{{ variant }}</span>
+                      }
+                    </div>
+                  }
+                </mat-card-content>
+
+                <!-- Actions -->
+                <mat-card-actions class="product-actions">
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    (click)="addToCart(product)"
+                    class="add-to-cart-btn"
+                    [attr.data-testid]="'add-to-cart-' + product.id"
+                    [matTooltip]="'Agregar ' + product.name + ' al carrito'"
+                  >
+                    <mat-icon>add_shopping_cart</mat-icon>
+                    Agregar al Carrito
+                  </button>
+                </mat-card-actions>
+              </mat-card>
+            }
+          </div>
+        }
+        <!-- End of @else block for loaded products -->
       </main>
     </div>
   </div>
