@@ -1,0 +1,277 @@
+<div class="checkout-container">
+  <div class="checkout-content">
+    <!-- Header -->
+    <div class="checkout-header">
+      <button mat-icon-button (click)="cancel()" aria-label="Volver al carrito">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>Finalizar Compra</h1>
+    </div>
+
+    <div class="checkout-grid">
+      <!-- Left column: Shipping Form -->
+      <mat-card class="shipping-form-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>local_shipping</mat-icon>
+            Información de Envío
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
+            <!-- Name -->
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre completo</mat-label>
+              <input matInput formControlName="shippingName" placeholder="Juan Pérez" required />
+              <mat-icon matPrefix>person</mat-icon>
+              @if (
+                checkoutForm.get('shippingName')?.invalid &&
+                checkoutForm.get('shippingName')?.touched
+              ) {
+                <mat-error>{{ getErrorMessage('shippingName') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Email -->
+            <mat-form-field appearance="outline">
+              <mat-label>Email</mat-label>
+              <input
+                matInput
+                type="email"
+                formControlName="shippingEmail"
+                placeholder="juan@example.com"
+                required
+              />
+              <mat-icon matPrefix>email</mat-icon>
+              @if (
+                checkoutForm.get('shippingEmail')?.invalid &&
+                checkoutForm.get('shippingEmail')?.touched
+              ) {
+                <mat-error>{{ getErrorMessage('shippingEmail') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Phone -->
+            <mat-form-field appearance="outline">
+              <mat-label>Teléfono</mat-label>
+              <input
+                matInput
+                type="tel"
+                formControlName="shippingPhone"
+                placeholder="+56912345678"
+                required
+              />
+              <mat-icon matPrefix>phone</mat-icon>
+              <mat-hint>Incluye código de país (+56 para Chile)</mat-hint>
+              @if (
+                checkoutForm.get('shippingPhone')?.invalid &&
+                checkoutForm.get('shippingPhone')?.touched
+              ) {
+                <mat-error>{{ getErrorMessage('shippingPhone') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Address -->
+            <mat-form-field appearance="outline">
+              <mat-label>Dirección de envío</mat-label>
+              <textarea
+                matInput
+                formControlName="shippingAddress"
+                placeholder="Av. Providencia 1234, Depto 506"
+                rows="2"
+                required
+              ></textarea>
+              <mat-icon matPrefix>home</mat-icon>
+              @if (
+                checkoutForm.get('shippingAddress')?.invalid &&
+                checkoutForm.get('shippingAddress')?.touched
+              ) {
+                <mat-error>{{ getErrorMessage('shippingAddress') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Region -->
+            <mat-form-field appearance="outline">
+              <mat-label>Región</mat-label>
+              <mat-select formControlName="shippingRegion" required>
+                @for (region of regions; track region) {
+                  <mat-option [value]="region">{{ region }}</mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix>map</mat-icon>
+              @if (
+                checkoutForm.get('shippingRegion')?.invalid &&
+                checkoutForm.get('shippingRegion')?.touched
+              ) {
+                <mat-error>{{ getErrorMessage('shippingRegion') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- City -->
+            <mat-form-field appearance="outline">
+              <mat-label>Ciudad</mat-label>
+              <input matInput formControlName="shippingCity" placeholder="Santiago" required />
+              <mat-icon matPrefix>location_city</mat-icon>
+              @if (
+                checkoutForm.get('shippingCity')?.invalid &&
+                checkoutForm.get('shippingCity')?.touched
+              ) {
+                <mat-error>{{ getErrorMessage('shippingCity') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Comuna (optional) -->
+            <mat-form-field appearance="outline">
+              <mat-label>Comuna (opcional)</mat-label>
+              <input matInput formControlName="shippingComuna" placeholder="Providencia" />
+              <mat-icon matPrefix>place</mat-icon>
+            </mat-form-field>
+
+            <!-- Notes (optional) -->
+            <mat-form-field appearance="outline">
+              <mat-label>Notas adicionales (opcional)</mat-label>
+              <textarea
+                matInput
+                formControlName="shippingNotes"
+                placeholder="Instrucciones de entrega, horario preferido, etc."
+                rows="2"
+              ></textarea>
+              <mat-icon matPrefix>note</mat-icon>
+            </mat-form-field>
+          </form>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Right column: Order Summary -->
+      <div class="order-summary-column">
+        <!-- Order Summary Card -->
+        <mat-card class="order-summary-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>shopping_cart</mat-icon>
+              Resumen de Compra
+            </mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <!-- Cart Items -->
+            <div class="cart-items-summary">
+              @for (item of cartService.items(); track item.product.id) {
+                <div class="cart-item-row">
+                  <img
+                    [src]="item.product.image"
+                    [alt]="item.product.name"
+                    class="item-thumbnail"
+                  />
+                  <div class="item-details">
+                    <span class="item-name">{{ item.product.name }}</span>
+                    <span class="item-quantity">Cantidad: {{ item.quantity }}</span>
+                  </div>
+                  <span class="item-price">{{
+                    formatPrice(item.product.price * item.quantity)
+                  }}</span>
+                </div>
+              }
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <!-- Pricing Breakdown -->
+            <div class="pricing-breakdown">
+              <div class="pricing-row">
+                <span>Subtotal</span>
+                <span>{{ formatPrice(subtotal()) }}</span>
+              </div>
+
+              <div class="pricing-row">
+                <span>Envío</span>
+                @if (shipping() === 0) {
+                  <span class="free-shipping">GRATIS</span>
+                } @else {
+                  <span>{{ formatPrice(shipping()) }}</span>
+                }
+              </div>
+
+              @if (subtotal() < 50000) {
+                <div class="shipping-notice">
+                  <mat-icon>info</mat-icon>
+                  <span>Envío gratis en compras sobre $50.000</span>
+                </div>
+              }
+
+              <mat-divider></mat-divider>
+
+              <div class="pricing-row total-row">
+                <span>Total</span>
+                <span class="total-price">{{ formatPrice(total()) }}</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Payment Method Info -->
+        <mat-card class="payment-info-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>payment</mat-icon>
+              Métodos de Pago Aceptados
+            </mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="payment-methods">
+              <div class="payment-method-item">
+                <mat-icon>credit_card</mat-icon>
+                <span>Webpay (Tarjetas de crédito/débito)</span>
+              </div>
+              <div class="payment-method-item">
+                <mat-icon>account_balance</mat-icon>
+                <span>RedCompra</span>
+              </div>
+              <div class="payment-method-item">
+                <mat-icon>phone_android</mat-icon>
+                <span>Mach, Klap (Billeteras digitales)</span>
+              </div>
+            </div>
+            <p class="payment-note">
+              <mat-icon>lock</mat-icon>
+              Pago seguro procesado por Flow.cl
+            </p>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button
+            mat-raised-button
+            type="button"
+            (click)="cancel()"
+            [disabled]="processing()"
+            class="cancel-button"
+          >
+            <mat-icon>arrow_back</mat-icon>
+            Volver al Carrito
+          </button>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            (click)="onSubmit()"
+            [disabled]="checkoutForm.invalid || processing()"
+            class="checkout-button"
+          >
+            @if (processing()) {
+              <mat-spinner diameter="20"></mat-spinner>
+              <span>Procesando...</span>
+            } @else {
+              <mat-icon>lock</mat-icon>
+              <span>Pagar {{ formatPrice(total()) }}</span>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

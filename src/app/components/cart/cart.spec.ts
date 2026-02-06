@@ -96,13 +96,18 @@ xdescribe('Cart', () => {
     expect(cartServiceMock.removeFromCart).not.toHaveBeenCalled();
   });
 
-  it('should show alert and clear cart on checkout', () => {
-    spyOn(window, 'alert');
+  it('should navigate to checkout when proceedToCheckout is called with authenticated user', () => {
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    const supabaseMock = jasmine.createSpyObj('SupabaseService', ['isAuthenticated']);
+    supabaseMock.isAuthenticated.and.returnValue(true);
 
-    component.checkout();
+    // Mock component with dependencies
+    (component as any).router = routerSpy;
+    (component as any).supabase = supabaseMock;
 
-    expect(window.alert).toHaveBeenCalledWith('¡Gracias por tu compra! Total: 199.98');
-    expect(cartServiceMock.clearCart).toHaveBeenCalled();
+    component.proceedToCheckout();
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/checkout']);
   });
 
   it('should render cart items', () => {

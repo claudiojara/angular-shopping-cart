@@ -7,6 +7,7 @@ export interface AppConfig {
   supabase: {
     url: string;
     anonKey: string;
+    serviceRoleKey?: string; // Optional - only in local config, never in production
   };
   environment: 'local' | 'development' | 'staging' | 'production';
   features?: {

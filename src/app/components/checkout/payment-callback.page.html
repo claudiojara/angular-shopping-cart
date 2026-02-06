@@ -1,0 +1,166 @@
+<div class="payment-callback-container">
+  <div class="payment-callback-content">
+    <mat-card class="callback-card">
+      <!-- Loading State -->
+      @if (loading()) {
+        <div class="loading-state">
+          <mat-spinner diameter="60"></mat-spinner>
+          <h2>Verificando pago...</h2>
+          <p>Por favor espera mientras confirmamos tu transacción</p>
+        </div>
+      }
+
+      <!-- Success State -->
+      @if (!loading() && status() === 'success') {
+        <div class="success-state">
+          <div class="icon-wrapper success">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <h1>¡Pago Exitoso!</h1>
+          <p class="subtitle">Tu compra ha sido procesada correctamente</p>
+
+          @if (order(); as orderData) {
+            <div class="order-details">
+              <div class="detail-row">
+                <span class="label">Número de Orden:</span>
+                <span class="value">#{{ orderData.id }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Total Pagado:</span>
+                <span class="value highlight">{{ formatPrice(orderData.totalAmount) }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Enviar a:</span>
+                <span class="value">{{ orderData.shippingName }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Dirección:</span>
+                <span class="value">{{ orderData.shippingAddress }}</span>
+              </div>
+            </div>
+
+            <div class="info-message">
+              <mat-icon>email</mat-icon>
+              <p>
+                Hemos enviado un email de confirmación a
+                <strong>{{ orderData.shippingEmail }}</strong>
+                con los detalles de tu compra y seguimiento de envío.
+              </p>
+            </div>
+          }
+
+          <div class="action-buttons">
+            <button mat-raised-button (click)="goToProducts()">
+              <mat-icon>storefront</mat-icon>
+              Seguir Comprando
+            </button>
+            <button mat-raised-button color="primary" (click)="goToOrders()">
+              <mat-icon>receipt_long</mat-icon>
+              Ver Mis Órdenes
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Failed State -->
+      @if (!loading() && status() === 'failed') {
+        <div class="failed-state">
+          <div class="icon-wrapper error">
+            <mat-icon>cancel</mat-icon>
+          </div>
+          <h1>Pago Fallido</h1>
+          <p class="subtitle">{{ errorMessage() || 'No se pudo procesar tu pago' }}</p>
+
+          <div class="error-message">
+            <mat-icon>info</mat-icon>
+            <div>
+              <p>
+                <strong>Posibles causas:</strong>
+              </p>
+              <ul>
+                <li>Fondos insuficientes en tu tarjeta</li>
+                <li>Datos de tarjeta incorrectos</li>
+                <li>Tarjeta bloqueada o vencida</li>
+                <li>Límite de transacciones excedido</li>
+              </ul>
+              <p>Por favor, intenta nuevamente con otra forma de pago.</p>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button mat-raised-button (click)="goToProducts()">
+              <mat-icon>storefront</mat-icon>
+              Volver a Productos
+            </button>
+            <button mat-raised-button color="primary" (click)="tryAgain()">
+              <mat-icon>refresh</mat-icon>
+              Intentar Nuevamente
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Pending State -->
+      @if (!loading() && status() === 'pending') {
+        <div class="pending-state">
+          <div class="icon-wrapper warning">
+            <mat-icon>schedule</mat-icon>
+          </div>
+          <h1>Pago en Proceso</h1>
+          <p class="subtitle">Tu pago está siendo verificado</p>
+
+          <div class="info-message">
+            <mat-icon>info</mat-icon>
+            <p>
+              Esto puede tomar algunos minutos. Te enviaremos un email cuando se confirme el pago.
+              Puedes revisar el estado en tu historial de órdenes.
+            </p>
+          </div>
+
+          <div class="action-buttons">
+            <button mat-raised-button (click)="goToProducts()">
+              <mat-icon>storefront</mat-icon>
+              Volver a Productos
+            </button>
+            <button mat-raised-button color="primary" (click)="goToOrders()">
+              <mat-icon>receipt_long</mat-icon>
+              Ver Mis Órdenes
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Unknown/Error State -->
+      @if (!loading() && status() === 'unknown') {
+        <div class="error-state">
+          <div class="icon-wrapper error">
+            <mat-icon>error_outline</mat-icon>
+          </div>
+          <h1>Error al Verificar Pago</h1>
+          <p class="subtitle">
+            {{ errorMessage() || 'No se pudo verificar el estado de tu pago' }}
+          </p>
+
+          <div class="error-message">
+            <mat-icon>warning</mat-icon>
+            <p>
+              Si realizaste el pago y este fue exitoso, te llegará un email de confirmación. Puedes
+              revisar el estado en tu historial de órdenes o contactarnos para ayudarte.
+            </p>
+          </div>
+
+          <div class="action-buttons">
+            <button mat-raised-button (click)="goToProducts()">
+              <mat-icon>storefront</mat-icon>
+              Volver a Productos
+            </button>
+            <button mat-raised-button color="primary" (click)="goToOrders()">
+              <mat-icon>receipt_long</mat-icon>
+              Ver Mis Órdenes
+            </button>
+          </div>
+        </div>
+      }
+    </mat-card>
+  </div>
+</div>

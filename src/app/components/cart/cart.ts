@@ -1,6 +1,6 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,6 +9,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CartService } from '../../services/cart.service';
+import { SupabaseService } from '../../services/supabase.service';
 import { OptimizedImagePipe } from '../../pipes/optimized-image.pipe';
 import { ClpCurrencyPipe } from '../../pipes/clp-currency.pipe';
 
@@ -33,6 +34,8 @@ import { ClpCurrencyPipe } from '../../pipes/clp-currency.pipe';
 })
 export class Cart {
   private cartService = inject(CartService);
+  private supabase = inject(SupabaseService);
+  private router = inject(Router);
 
   items = this.cartService.items;
   total = this.cartService.total;
@@ -54,11 +57,26 @@ export class Cart {
     this.cartService.clearCart();
   }
 
-  checkout(): void {
-    const formattedTotal = Math.round(this.total())
-      .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    alert('¡Gracias por tu compra! Total: $' + formattedTotal);
-    this.clearCart();
+  /**
+   * Navigate to checkout page
+   * Requires user to be authenticated
+   */
+  proceedToCheckout(): void {
+    // Check if user is authenticated
+    if (!this.supabase.isAuthenticated()) {
+      // Store current URL for redirect after login
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: '/checkout' },
+      });
+      return;
+    }
+
+    // Check if cart has items
+    if (this.items().length === 0) {
+      return;
+    }
+
+    // Navigate to checkout
+    this.router.navigate(['/checkout']);
   }
 }

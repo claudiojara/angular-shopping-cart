@@ -1,0 +1,309 @@
+.payment-callback-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.payment-callback-content {
+  width: 100%;
+  max-width: 700px;
+}
+
+.callback-card {
+  padding: 2rem;
+  text-align: center;
+}
+
+// Loading State
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem 0;
+
+  mat-spinner {
+    ::ng-deep circle {
+      stroke: #667eea;
+    }
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.87);
+  }
+
+  p {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+// Icon Wrapper
+.icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 1.5rem;
+
+  mat-icon {
+    font-size: 4rem;
+    width: 4rem;
+    height: 4rem;
+  }
+
+  &.success {
+    background: rgba(76, 175, 80, 0.1);
+
+    mat-icon {
+      color: #4caf50;
+    }
+  }
+
+  &.error {
+    background: rgba(244, 67, 54, 0.1);
+
+    mat-icon {
+      color: #f44336;
+    }
+  }
+
+  &.warning {
+    background: rgba(255, 152, 0, 0.1);
+
+    mat-icon {
+      color: #ff9800;
+    }
+  }
+}
+
+// Common State Styles
+.success-state,
+.failed-state,
+.pending-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+
+  h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.87);
+  }
+
+  .subtitle {
+    margin: 0 0 2rem 0;
+    font-size: 1.1rem;
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+// Order Details
+.order-details {
+  width: 100%;
+  background: rgba(102, 126, 234, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .label {
+    font-size: 0.95rem;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .value {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.87);
+    text-align: right;
+
+    &.highlight {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #667eea;
+    }
+  }
+}
+
+// Info/Error Messages
+.info-message,
+.error-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  text-align: left;
+
+  mat-icon {
+    flex-shrink: 0;
+    font-size: 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-top: 0.2rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+
+    strong {
+      font-weight: 600;
+    }
+  }
+
+  ul {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+
+    li {
+      margin: 0.25rem 0;
+    }
+  }
+}
+
+.info-message {
+  background: #e3f2fd;
+  color: #1976d2;
+
+  mat-icon {
+    color: #1976d2;
+  }
+}
+
+.error-message {
+  background: #ffebee;
+  color: #c62828;
+
+  mat-icon {
+    color: #f44336;
+  }
+}
+
+// Action Buttons
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  width: 100%;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+  }
+
+  button {
+    flex: 1;
+    max-width: 250px;
+    height: 48px;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    mat-icon {
+      font-size: 1.5rem;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    &[color='primary'] {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+
+      &:hover {
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .payment-callback-container {
+    padding: 1rem 0.5rem;
+  }
+
+  .callback-card {
+    padding: 1.5rem;
+  }
+
+  .success-state,
+  .failed-state,
+  .pending-state,
+  .error-state {
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+    }
+  }
+
+  .icon-wrapper {
+    width: 80px;
+    height: 80px;
+
+    mat-icon {
+      font-size: 3rem;
+      width: 3rem;
+      height: 3rem;
+    }
+  }
+
+  .order-details {
+    padding: 1rem;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+
+    .value {
+      text-align: left;
+    }
+  }
+
+  .info-message,
+  .error-message {
+    padding: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .action-buttons {
+    button {
+      max-width: 100%;
+    }
+  }
+}

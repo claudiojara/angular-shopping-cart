@@ -219,4 +219,34 @@ export class CartService {
       }
     }
   }
+
+  /**
+   * Clears cart after successful checkout
+   * Called automatically after payment confirmation
+   * Does NOT show confirmation dialog (unlike clearCart)
+   */
+  async clearCartAfterCheckout(): Promise<void> {
+    // Clear local state immediately
+    this.cartItems.set([]);
+
+    // Sync to DB if authenticated
+    if (this.supabase.isAuthenticated()) {
+      try {
+        const user = this.supabase.getCurrentUser();
+        if (!user) return;
+
+        const { error } = await this.supabase.client
+          .from('cart_items')
+          .delete()
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('Error clearing cart after checkout:', error);
+          // Don't rollback - payment was successful, cart should stay empty
+        }
+      } catch (error) {
+        console.error('Error clearing cart after checkout:', error);
+      }
+    }
+  }
 }

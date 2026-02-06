@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './guards/auth.guard';
 
 // Optimización #5: Lazy loading de rutas para reducir bundle inicial
 export const routes: Routes = [
@@ -11,6 +12,17 @@ export const routes: Routes = [
   {
     path: 'cart',
     loadComponent: () => import('./components/cart/cart').then((m) => m.Cart),
+  },
+  {
+    path: 'checkout',
+    loadComponent: () => import('./components/checkout/checkout.page').then((m) => m.CheckoutPage),
+    canActivate: [authGuard], // Requires authentication
+  },
+  {
+    path: 'payment/callback',
+    loadComponent: () =>
+      import('./components/checkout/payment-callback.page').then((m) => m.PaymentCallbackPage),
+    // No auth guard - needs to accept Flow redirects
   },
   {
     path: 'login',

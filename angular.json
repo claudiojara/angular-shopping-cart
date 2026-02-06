@@ -35,6 +35,11 @@
                 "glob": "staticwebapp.config.json",
                 "input": ".",
                 "output": "/"
+              },
+              {
+                "glob": "payment-callback.html",
+                "input": "src",
+                "output": "/"
               }
             ],
             "styles": ["src/styles.scss"]
