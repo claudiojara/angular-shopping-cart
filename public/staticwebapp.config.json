@@ -20,6 +20,11 @@
       "allowedRoles": ["anonymous"]
     },
     {
+      "route": "/payment/callback",
+      "methods": ["GET", "POST"],
+      "rewrite": "/index.html"
+    },
+    {
       "route": "/products",
       "rewrite": "/index.html"
     },
