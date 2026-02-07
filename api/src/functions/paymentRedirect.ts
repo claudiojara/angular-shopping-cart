@@ -2,10 +2,10 @@ import { app, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/fu
 
 /**
  * Azure Function: payment-redirect
- * 
+ *
  * Handles POST redirect from Flow payment gateway and converts it to GET redirect
  * to Angular app callback page.
- * 
+ *
  * Flow sends POST with token in body, but Angular SPA needs GET with query params.
  */
 export async function paymentRedirect(
@@ -24,7 +24,7 @@ export async function paymentRedirect(
     if (!token) {
       // No token - redirect to callback without it (will use localStorage fallback)
       return {
-        status: 302,
+        status: 303, // 303 See Other - forces GET on redirect
         headers: {
           Location: '/payment/callback',
         },
@@ -33,17 +33,17 @@ export async function paymentRedirect(
 
     // Redirect to Angular callback with token as query param
     return {
-      status: 302,
+      status: 303, // 303 See Other - forces GET on redirect
       headers: {
         Location: `/payment/callback?token=${encodeURIComponent(token)}`,
       },
     };
   } catch (error) {
     context.error('Error processing payment redirect:', error);
-    
+
     // On error, redirect to callback without token (will use localStorage)
     return {
-      status: 302,
+      status: 303, // 303 See Other - forces GET on redirect
       headers: {
         Location: '/payment/callback',
       },
