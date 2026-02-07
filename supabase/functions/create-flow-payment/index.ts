@@ -208,7 +208,7 @@ serve(async (req) => {
       commerceOrder: order.id.toString(),
       subject: `Orden #${order.id} - Forja del Destino`,
       currency: 'CLP',
-      amount: Math.round(order.total_amount / 100), // Convert from cents to pesos
+      amount: Math.round(order.total_amount), // Amount is already in CLP pesos
       email: order.shipping_email,
       urlConfirmation: webhookUrl,
       urlReturn: returnUrl, // Flow will append ?token=XXXXX automatically
