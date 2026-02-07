@@ -34,6 +34,10 @@
     {
       "route": "/register",
       "rewrite": "/index.html"
+    },
+    {
+      "route": "/payment/*",
+      "rewrite": "/index.html"
     }
   ],
   "responseOverrides": {
