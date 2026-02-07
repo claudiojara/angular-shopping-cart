@@ -4,7 +4,7 @@ import {
   provideZoneChangeDetection,
   APP_INITIALIZER,
 } from '@angular/core';
-import { provideRouter, withHashLocation } from '@angular/router';
+import { provideRouter } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 
@@ -33,7 +33,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes, withHashLocation()), // Use hash location strategy for Flow POST redirects
+    provideRouter(routes), // Use path location strategy (Azure Static Web Apps handles routing)
     provideAnimationsAsync(),
     provideHttpClient(withFetch()),
     {
