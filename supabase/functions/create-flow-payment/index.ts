@@ -203,12 +203,18 @@ serve(async (req) => {
       throw new Error('Flow URLs not configured');
     }
 
+    // Validate amount is positive
+    if (order.total_amount <= 0) {
+      throw new Error('Order amount must be greater than 0');
+    }
+
     // Prepare payment data
+    // Note: Math.round() ensures amount is an integer (Flow expects whole CLP pesos, no decimals)
     const paymentData: FlowPaymentRequest = {
       commerceOrder: order.id.toString(),
       subject: `Orden #${order.id} - Forja del Destino`,
       currency: 'CLP',
-      amount: Math.round(order.total_amount), // Amount is already in CLP pesos
+      amount: Math.round(order.total_amount), // Round to handle potential floating point precision issues
       email: order.shipping_email,
       urlConfirmation: webhookUrl,
       urlReturn: returnUrl, // Flow will append ?token=XXXXX automatically
