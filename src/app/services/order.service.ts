@@ -136,7 +136,15 @@ export class OrderService {
 
       console.log('🔐 [OrderService] Initiating Flow payment for order:', orderId);
 
-      // Send anon key as Bearer token (required by Supabase)
+      // Get current user session token (JWT)
+      const { data: sessionData } = await this.supabase.client.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+
+      if (!accessToken) {
+        throw new Error('Usuario no autenticado. Por favor inicia sesión nuevamente.');
+      }
+
+      // Send user JWT as Bearer token (required for authenticated Edge Functions)
       const response = await firstValueFrom(
         this.http.post<FlowPaymentResponse>(
           functionUrl,
@@ -146,7 +154,7 @@ export class OrderService {
           {
             headers: {
               apikey: anonKey,
-              Authorization: `Bearer ${anonKey}`,
+              Authorization: `Bearer ${accessToken}`,
               'Content-Type': 'application/json',
             },
           },
