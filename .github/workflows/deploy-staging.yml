@@ -155,38 +155,39 @@ jobs:
           path: playwright-report-ci/
           retention-days: 30
 
-  # Job 4: Lighthouse performance audit (runs in parallel with smoke tests)
-  lighthouse:
-    name: Lighthouse Performance Audit
-    needs: build-and-deploy
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-
-      - name: Install Lighthouse CI
-        run: npm install -g @lhci/cli@0.13.x
-
-      - name: Wait for deployment
-        run: npx wait-on https://agreeable-sand-011792d0f.6.azurestaticapps.net --timeout 120000
-
-      - name: Run Lighthouse CI
-        run: lhci autorun
-        env:
-          CI: true
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-
-      - name: Upload Lighthouse results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: lighthouse-results-staging
-          path: .lighthouseci/
-          retention-days: 30
+  # Job 4: Lighthouse performance audit (TEMPORARILY DISABLED - requires LHCI_GITHUB_APP_TOKEN)
+  # TODO: Re-enable after configuring LHCI_GITHUB_APP_TOKEN secret
+  # lighthouse:
+  #   name: Lighthouse Performance Audit
+  #   needs: build-and-deploy
+  #   runs-on: ubuntu-latest
+  #
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version-file: '.nvmrc'
+  #         cache: 'npm'
+  #
+  #     - name: Install Lighthouse CI
+  #       run: npm install -g @lhci/cli@0.13.x
+  #
+  #     - name: Wait for deployment
+  #       run: npx wait-on https://agreeable-sand-011792d0f.6.azurestaticapps.net --timeout 120000
+  #
+  #     - name: Run Lighthouse CI
+  #       run: lhci autorun
+  #       env:
+  #         CI: true
+  #         LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+  #
+  #     - name: Upload Lighthouse results
+  #       if: always()
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: lighthouse-results-staging
+  #         path: .lighthouseci/
+  #         retention-days: 30

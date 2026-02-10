@@ -130,8 +130,8 @@ export class OrderService {
 
     try {
       // Use Azure Function instead of Supabase Edge Function (authentication issues)
-      const functionUrl =
-        'https://witty-bush-0d65a3d0f.2.azurestaticapps.net/api/create-flow-payment';
+      // Use relative URL to work in both staging and production environments
+      const functionUrl = '/api/create-flow-payment';
 
       console.log('🔐 [OrderService] Initiating Flow payment for order:', orderId);
       console.log('📡 [OrderService] Calling Azure Function:', functionUrl);
