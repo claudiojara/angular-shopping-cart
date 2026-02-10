@@ -112,7 +112,9 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: 'upload'
           app_location: 'dist/shopping-cart/browser'
+          api_location: 'api'
           skip_app_build: true
+          skip_api_build: false
 
   # Job 3: E2E smoke tests (waits for deployment)
   smoke-tests:
