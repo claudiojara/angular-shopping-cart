@@ -197,9 +197,12 @@ export async function flowWebhook(
     }
 
     // If payment successful, reduce product stock
-    if (orderStatus === 'paid') {
+    // Only reduce if order wasn't already paid (idempotency)
+    if (orderStatus === 'paid' && order.status !== 'paid') {
       await reduceProductStock(supabase, orderId);
       context.log(`✅ Order ${orderId} marked as paid, stock reduced`);
+    } else if (orderStatus === 'paid' && order.status === 'paid') {
+      context.log(`ℹ️ Order ${orderId} already paid, skipping stock reduction`);
     }
 
     // Return 200 OK to Flow (required)
