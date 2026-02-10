@@ -212,10 +212,15 @@ async function logPaymentAudit(
     const { error } = await supabase.from('payment_audit_log').insert(auditEntry);
 
     if (error) {
-      // Table might not exist, log to console instead
-      context.log('📋 Payment Audit (table may not exist):', auditEntry);
+      // Log the ACTUAL error for debugging
+      context.error('❌ FAILED to insert payment audit:', {
+        error: error.message,
+        details: error.details,
+        hint: error.hint,
+        auditEntry: auditEntry,
+      });
     } else {
-      context.log('📋 Payment audit logged:', auditEntry);
+      context.log('✅ Payment audit logged successfully:', auditEntry);
     }
   } catch (err) {
     context.error('Error logging payment audit:', err);
