@@ -129,31 +129,17 @@ export class OrderService {
     this._error.set(null);
 
     try {
-      const config = this.config.getConfig();
-      const supabaseUrl = config.supabase.url;
-      const anonKey = config.supabase.anonKey;
-      const functionUrl = `${supabaseUrl}/functions/v1/create-flow-payment`;
+      // Use Azure Function instead of Supabase Edge Function (authentication issues)
+      const functionUrl =
+        'https://witty-bush-0d65a3d0f.2.azurestaticapps.net/api/create-flow-payment';
 
       console.log('🔐 [OrderService] Initiating Flow payment for order:', orderId);
+      console.log('📡 [OrderService] Calling Azure Function:', functionUrl);
 
-      // Get current user JWT token from Supabase session
-      const { data: sessionData, error: sessionError } =
-        await this.supabase.client.auth.getSession();
-
-      if (sessionError || !sessionData.session) {
-        throw new Error('No hay sesión activa. Por favor inicia sesión nuevamente.');
-      }
-
-      const accessToken = sessionData.session.access_token;
-
-      console.log('📡 [OrderService] Using user JWT token for authentication');
-
-      // Use fetch directly with user's JWT token
+      // Use fetch directly - Azure Function has anonymous auth
       const fetchResponse = await fetch(functionUrl, {
         method: 'POST',
         headers: {
-          apikey: anonKey,
-          Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ orderId }),
