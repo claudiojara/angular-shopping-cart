@@ -1,15 +1,15 @@
-# Lighthouse CI integrado en deploy-staging.yml y deploy-production.yml
-# Este workflow está deshabilitado para evitar duplicados
+# Lighthouse CI - Performance Audit
+# Runs after successful deployment to staging
 
-# name: Lighthouse CI
-#
-# on:
-#   # Solo correr después de deployment exitoso, no en cada push
-#   workflow_run:
-#     workflows: ["Deploy to Staging"]
-#     types:
-#       - completed
-#     branches: [develop]
+name: Lighthouse CI
+
+on:
+  # Solo correr después de deployment exitoso, no en cada push
+  workflow_run:
+    workflows: ['Deploy to Staging']
+    types:
+      - completed
+    branches: [develop]
 
 jobs:
   lighthouse:
