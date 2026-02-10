@@ -129,39 +129,29 @@ export class OrderService {
     this._error.set(null);
 
     try {
+      const config = this.config.getConfig();
+      const supabaseUrl = config.supabase.url;
+      const anonKey = config.supabase.anonKey;
+      const functionUrl = `${supabaseUrl}/functions/v1/create-flow-payment`;
+
       console.log('🔐 [OrderService] Initiating Flow payment for order:', orderId);
 
-      // Get current user session token (JWT)
-      const { data: sessionData } = await this.supabase.client.auth.getSession();
-      const accessToken = sessionData?.session?.access_token;
-
-      if (!accessToken) {
-        throw new Error('Usuario no autenticado. Por favor inicia sesión nuevamente.');
-      }
-
-      console.log('📡 [OrderService] Calling Edge Function with JWT token');
-
-      // Use Supabase functions.invoke() which handles authentication headers correctly
-      const { data, error } = await this.supabase.client.functions.invoke<FlowPaymentResponse>(
-        'create-flow-payment',
-        {
-          body: { orderId },
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
+      // Send anon key as Bearer token (required by Supabase Edge Functions)
+      const response = await firstValueFrom(
+        this.http.post<FlowPaymentResponse>(
+          functionUrl,
+          {
+            orderId,
           },
-        },
+          {
+            headers: {
+              apikey: anonKey,
+              Authorization: `Bearer ${anonKey}`,
+              'Content-Type': 'application/json',
+            },
+          },
+        ),
       );
-
-      if (error) {
-        console.error('❌ [OrderService] Edge Function error:', error);
-        throw new Error(`Error del servidor: ${error.message}`);
-      }
-
-      if (!data) {
-        throw new Error('No se recibió respuesta del servidor');
-      }
-
-      const response = data;
 
       if (!response.success) {
         throw new Error(response.error || 'Error al iniciar pago Flow');
