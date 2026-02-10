@@ -131,23 +131,29 @@ export class OrderService {
     try {
       const config = this.config.getConfig();
       const supabaseUrl = config.supabase.url;
-      // Use serviceRoleKey for Edge Functions - anonKey is being rejected with "Invalid JWT"
-      const serviceRoleKey = config.supabase.serviceRoleKey;
-
-      if (!serviceRoleKey) {
-        throw new Error('Service Role Key no configurada. Contacte al administrador.');
-      }
-
+      const anonKey = config.supabase.anonKey;
       const functionUrl = `${supabaseUrl}/functions/v1/create-flow-payment`;
 
       console.log('🔐 [OrderService] Initiating Flow payment for order:', orderId);
 
-      // Use fetch directly with serviceRoleKey
+      // Get current user JWT token from Supabase session
+      const { data: sessionData, error: sessionError } =
+        await this.supabase.client.auth.getSession();
+
+      if (sessionError || !sessionData.session) {
+        throw new Error('No hay sesión activa. Por favor inicia sesión nuevamente.');
+      }
+
+      const accessToken = sessionData.session.access_token;
+
+      console.log('📡 [OrderService] Using user JWT token for authentication');
+
+      // Use fetch directly with user's JWT token
       const fetchResponse = await fetch(functionUrl, {
         method: 'POST',
         headers: {
-          apikey: serviceRoleKey,
-          Authorization: `Bearer ${serviceRoleKey}`,
+          apikey: anonKey,
+          Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ orderId }),
