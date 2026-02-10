@@ -136,22 +136,25 @@ export class OrderService {
 
       console.log('🔐 [OrderService] Initiating Flow payment for order:', orderId);
 
-      // Send anon key as Bearer token (required by Supabase Edge Functions)
-      const response = await firstValueFrom(
-        this.http.post<FlowPaymentResponse>(
-          functionUrl,
-          {
-            orderId,
-          },
-          {
-            headers: {
-              apikey: anonKey,
-              Authorization: `Bearer ${anonKey}`,
-              'Content-Type': 'application/json',
-            },
-          },
-        ),
-      );
+      // Use fetch directly with anonKey to avoid automatic JWT injection from Supabase client
+      // This matches the curl example: Authorization: Bearer <anonKey>
+      const fetchResponse = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ orderId }),
+      });
+
+      if (!fetchResponse.ok) {
+        const errorData = await fetchResponse.json().catch(() => ({}));
+        console.error('❌ [OrderService] HTTP error:', fetchResponse.status, errorData);
+        throw new Error(errorData.message || `Error HTTP ${fetchResponse.status}`);
+      }
+
+      const response: FlowPaymentResponse = await fetchResponse.json();
 
       if (!response.success) {
         throw new Error(response.error || 'Error al iniciar pago Flow');
