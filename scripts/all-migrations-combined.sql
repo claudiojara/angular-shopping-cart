@@ -1725,3 +1725,488 @@ SELECT 'tags', COUNT(*) FROM tags;
 -- - All records marked as active (is_active = true)
 -- - Descriptions provided for better UX
 -- ============================================================================
+
+-- ============================================================================
+-- 15-create-payment-audit-log.sql
+-- ============================================================================
+-- =====================================================
+-- Script 15: Crear Tabla de Auditoría de Pagos
+-- Descripción: Registro completo de pagos procesados desde Flow.cl
+-- Orden de ejecución: DECIMOQUINTO
+-- =====================================================
+
+-- TABLA: payment_audit_log
+-- Almacena registro de auditoría para cada pago procesado
+CREATE TABLE IF NOT EXISTS payment_audit_log (
+  id BIGSERIAL PRIMARY KEY,
+  order_id BIGINT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  
+  -- Información de Flow
+  flow_order_id VARCHAR(255),
+  
+  -- Estado del pago
+  status VARCHAR(50) NOT NULL,
+  
+  -- Monto del pago (para validación)
+  amount DECIMAL(12,2) NOT NULL,
+  
+  -- Método de pago utilizado
+  payment_method VARCHAR(100),
+  
+  -- Resultado del procesamiento de stock
+  stock_processed INTEGER DEFAULT 0,
+  stock_success BOOLEAN DEFAULT false,
+  stock_errors JSONB DEFAULT '[]',
+  
+  -- Timestamps
+  processed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+COMMENT ON TABLE payment_audit_log IS 'Registro de auditoría para pagos procesados desde Flow.cl';
+COMMENT ON COLUMN payment_audit_log.order_id IS 'Referencia a la orden pagada';
+COMMENT ON COLUMN payment_audit_log.flow_order_id IS 'ID de Flow para trazabilidad';
+COMMENT ON COLUMN payment_audit_log.status IS 'Estado final del pago (paid, failed, cancelled)';
+COMMENT ON COLUMN payment_audit_log.amount IS 'Monto procesado (para detección de fraude)';
+COMMENT ON COLUMN payment_audit_log.payment_method IS 'Método de pago (Webpay, Servipag, etc.)';
+COMMENT ON COLUMN payment_audit_log.stock_processed IS 'Cantidad de productos con stock reducido';
+COMMENT ON COLUMN payment_audit_log.stock_success IS 'Indica si la reducción de stock fue exitosa';
+COMMENT ON COLUMN payment_audit_log.stock_errors IS 'Array de errores si falló la reducción de stock';
+COMMENT ON COLUMN payment_audit_log.processed_at IS 'Fecha/hora de procesamiento del webhook';
+
+-- =====================================================
+-- ÍNDICES
+-- =====================================================
+
+-- Índice para búsqueda por orden
+CREATE INDEX IF NOT EXISTS idx_payment_audit_order_id 
+  ON payment_audit_log(order_id);
+
+-- Índice para búsqueda por Flow order ID
+CREATE INDEX IF NOT EXISTS idx_payment_audit_flow_order_id 
+  ON payment_audit_log(flow_order_id);
+
+-- Índice para búsqueda por fecha (útil para reportes)
+CREATE INDEX IF NOT EXISTS idx_payment_audit_processed_at 
+  ON payment_audit_log(processed_at DESC);
+
+-- Índice para filtrar por estado
+CREATE INDEX IF NOT EXISTS idx_payment_audit_status 
+  ON payment_audit_log(status);
+
+-- Índice para encontrar pagos con errores de stock
+CREATE INDEX IF NOT EXISTS idx_payment_audit_stock_success 
+  ON payment_audit_log(stock_success) 
+  WHERE stock_success = false;
+
+-- =====================================================
+-- RLS POLICIES
+-- =====================================================
+
+-- Habilitar RLS
+ALTER TABLE payment_audit_log ENABLE ROW LEVEL SECURITY;
+
+-- POLICY: Permitir insert desde service role (webhook)
+CREATE POLICY "Allow insert from service role" 
+  ON payment_audit_log 
+  FOR INSERT 
+  WITH CHECK (true);
+
+-- POLICY: Los usuarios pueden ver sus propios registros de auditoría
+CREATE POLICY "Users can view own payment audit logs"
+  ON payment_audit_log 
+  FOR SELECT 
+  USING (
+    EXISTS (
+      SELECT 1 FROM orders
+      WHERE orders.id = payment_audit_log.order_id
+      AND orders.user_id = auth.uid()
+    )
+  );
+
+-- POLICY: Solo admins pueden actualizar registros de auditoría
+CREATE POLICY "Only admins can update audit logs"
+  ON payment_audit_log 
+  FOR UPDATE
+  USING (false);
+
+-- POLICY: No permitir deletes (auditoría inmutable)
+CREATE POLICY "No deletes allowed on audit logs"
+  ON payment_audit_log 
+  FOR DELETE
+  USING (false);
+
+-- =====================================================
+-- VISTA: Resumen de pagos por día
+-- =====================================================
+
+CREATE OR REPLACE VIEW payment_daily_summary AS
+SELECT 
+  DATE(processed_at) as date,
+  COUNT(*) as total_payments,
+  SUM(amount) as total_amount,
+  COUNT(CASE WHEN status = 'paid' THEN 1 END) as successful_payments,
+  SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) as successful_amount,
+  SUM(CASE WHEN stock_success THEN 1 ELSE 0 END) as stock_updates_successful,
+  SUM(CASE WHEN NOT stock_success THEN 1 ELSE 0 END) as stock_updates_failed
+FROM payment_audit_log
+GROUP BY DATE(processed_at)
+ORDER BY date DESC;
+
+COMMENT ON VIEW payment_daily_summary IS 'Resumen diario de pagos procesados con estadísticas de stock';
+
+-- =====================================================
+-- VISTA: Pagos con errores de stock
+-- =====================================================
+
+CREATE OR REPLACE VIEW payment_stock_errors AS
+SELECT 
+  pal.id,
+  pal.order_id,
+  pal.flow_order_id,
+  pal.status,
+  pal.amount,
+  pal.payment_method,
+  pal.stock_processed,
+  pal.stock_errors,
+  pal.processed_at,
+  o.user_id,
+  o.shipping_email
+FROM payment_audit_log pal
+JOIN orders o ON o.id = pal.order_id
+WHERE pal.stock_success = false
+ORDER BY pal.processed_at DESC;
+
+COMMENT ON VIEW payment_stock_errors IS 'Lista de pagos donde falló la reducción de stock (requiere atención)';
+
+-- =====================================================
+-- FUNCIÓN: Obtener auditoría de pago por orden
+-- =====================================================
+
+CREATE OR REPLACE FUNCTION get_payment_audit_by_order(
+  p_order_id BIGINT
+)
+RETURNS TABLE (
+  id BIGINT,
+  flow_order_id VARCHAR(255),
+  status VARCHAR(50),
+  amount DECIMAL(12,2),
+  payment_method VARCHAR(100),
+  stock_processed INTEGER,
+  stock_success BOOLEAN,
+  stock_errors JSONB,
+  processed_at TIMESTAMP WITH TIME ZONE
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    pal.id,
+    pal.flow_order_id,
+    pal.status,
+    pal.amount,
+    pal.payment_method,
+    pal.stock_processed,
+    pal.stock_success,
+    pal.stock_errors,
+    pal.processed_at
+  FROM payment_audit_log pal
+  WHERE pal.order_id = p_order_id
+  ORDER BY pal.processed_at DESC;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+COMMENT ON FUNCTION get_payment_audit_by_order IS 'Obtiene el historial de auditoría de pagos para una orden específica';
+
+-- =====================================================
+-- VERIFICACIÓN
+-- =====================================================
+
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'payment_audit_log') THEN
+    RAISE NOTICE '✓ Tabla payment_audit_log creada correctamente';
+  END IF;
+  
+  IF EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'payment_daily_summary') THEN
+    RAISE NOTICE '✓ Vista payment_daily_summary creada correctamente';
+  END IF;
+  
+  IF EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'payment_stock_errors') THEN
+    RAISE NOTICE '✓ Vista payment_stock_errors creada correctamente';
+  END IF;
+END $$;
+
+-- ============================================================================
+-- 16-create-reduce-stock-function.sql
+-- ============================================================================
+-- =====================================================
+-- Script 16: Crear Función de Reducción de Stock
+-- Descripción: Función segura para reducir stock de productos
+-- Orden de ejecución: DECIMOSEXTO
+-- =====================================================
+
+-- =====================================================
+-- FUNCIÓN: Reducir stock de producto
+-- =====================================================
+
+CREATE OR REPLACE FUNCTION reduce_product_stock(
+  p_product_id BIGINT,
+  p_quantity INTEGER
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_current_stock INTEGER;
+  v_product_name VARCHAR(255);
+  v_new_stock INTEGER;
+BEGIN
+  -- Obtener información actual del producto
+  SELECT 
+    stock_quantity, 
+    name 
+  INTO 
+    v_current_stock, 
+    v_product_name
+  FROM products
+  WHERE id = p_product_id;
+  
+  -- Verificar que el producto existe
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Producto no encontrado: %', p_product_id;
+  END IF;
+  
+  -- Verificar stock suficiente
+  IF v_current_stock < p_quantity THEN
+    RAISE EXCEPTION 'Stock insuficiente para producto "%": solicitado %, disponible %', 
+      v_product_name, p_quantity, v_current_stock;
+  END IF;
+  
+  -- Calcular nuevo stock
+  v_new_stock := v_current_stock - p_quantity;
+  
+  -- Actualizar stock
+  UPDATE products
+  SET 
+    stock_quantity = v_new_stock,
+    updated_at = NOW()
+  WHERE id = p_product_id;
+  
+  -- Verificar que se actualizó
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Error al actualizar stock para producto: %', p_product_id;
+  END IF;
+  
+  -- Log de éxito (opcional, para debugging)
+  RAISE NOTICE 'Stock reducido para "%": % → % (-% unidades)', 
+    v_product_name, v_current_stock, v_new_stock, p_quantity;
+    
+END;
+$$;
+
+COMMENT ON FUNCTION reduce_product_stock IS 'Reduce el stock de un producto de forma segura. Verifica stock suficiente y actualiza automáticamente. Usada por el webhook de Flow.';
+
+-- =====================================================
+-- FUNCIÓN: Incrementar stock (para devoluciones/cancelaciones)
+-- =====================================================
+
+CREATE OR REPLACE FUNCTION increment_product_stock(
+  p_product_id BIGINT,
+  p_quantity INTEGER
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_current_stock INTEGER;
+  v_product_name VARCHAR(255);
+  v_new_stock INTEGER;
+BEGIN
+  -- Obtener información actual del producto
+  SELECT 
+    stock_quantity, 
+    name 
+  INTO 
+    v_current_stock, 
+    v_product_name
+  FROM products
+  WHERE id = p_product_id;
+  
+  -- Verificar que el producto existe
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Producto no encontrado: %', p_product_id;
+  END IF;
+  
+  -- Calcular nuevo stock
+  v_new_stock := v_current_stock + p_quantity;
+  
+  -- Actualizar stock
+  UPDATE products
+  SET 
+    stock_quantity = v_new_stock,
+    updated_at = NOW()
+  WHERE id = p_product_id;
+  
+  -- Verificar que se actualizó
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Error al incrementar stock para producto: %', p_product_id;
+  END IF;
+  
+  -- Log de éxito
+  RAISE NOTICE 'Stock incrementado para "%": % → % (+% unidades)', 
+    v_product_name, v_current_stock, v_new_stock, p_quantity;
+    
+END;
+$$;
+
+COMMENT ON FUNCTION increment_product_stock IS 'Incrementa el stock de un producto (útil para devoluciones o cancelaciones). Usada para revertir reducciones de stock.';
+
+-- =====================================================
+-- FUNCIÓN: Verificar disponibilidad de stock
+-- =====================================================
+
+CREATE OR REPLACE FUNCTION check_product_stock(
+  p_product_id BIGINT,
+  p_quantity INTEGER
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_current_stock INTEGER;
+BEGIN
+  SELECT stock_quantity 
+  INTO v_current_stock
+  FROM products
+  WHERE id = p_product_id;
+  
+  IF NOT FOUND THEN
+    RETURN false;
+  END IF;
+  
+  RETURN v_current_stock >= p_quantity;
+END;
+$$;
+
+COMMENT ON FUNCTION check_product_stock IS 'Verifica si hay stock suficiente para un producto sin modificarlo. Retorna true si hay stock suficiente.';
+
+-- =====================================================
+-- FUNCIÓN: Obtener stock actual
+-- =====================================================
+
+CREATE OR REPLACE FUNCTION get_product_stock(
+  p_product_id BIGINT
+)
+RETURNS INTEGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_stock INTEGER;
+BEGIN
+  SELECT stock_quantity 
+  INTO v_stock
+  FROM products
+  WHERE id = p_product_id;
+  
+  IF NOT FOUND THEN
+    RETURN NULL;
+  END IF;
+  
+  RETURN v_stock;
+END;
+$$;
+
+COMMENT ON FUNCTION get_product_stock IS 'Obtiene el stock actual de un producto. Retorna NULL si el producto no existe.';
+
+-- =====================================================
+-- TRIGGER: Prevenir stock negativo
+-- =====================================================
+
+CREATE OR REPLACE FUNCTION prevent_negative_stock()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.stock_quantity < 0 THEN
+    RAISE EXCEPTION 'El stock no puede ser negativo. Producto: %, Stock intentado: %', 
+      NEW.name, NEW.stock_quantity;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Aplicar trigger a tabla products si no existe
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger 
+    WHERE tgname = 'trigger_prevent_negative_stock'
+  ) THEN
+    CREATE TRIGGER trigger_prevent_negative_stock
+      BEFORE INSERT OR UPDATE ON products
+      FOR EACH ROW
+      EXECUTE FUNCTION prevent_negative_stock();
+    
+    RAISE NOTICE '✓ Trigger prevent_negative_stock creado';
+  END IF;
+END $$;
+
+COMMENT ON FUNCTION prevent_negative_stock() IS 'Trigger que previene que el stock de un producto sea negativo';
+
+-- =====================================================
+-- VISTA: Productos con bajo stock
+-- =====================================================
+
+CREATE OR REPLACE VIEW products_low_stock AS
+SELECT 
+  id,
+  name,
+  slug,
+  stock_quantity,
+  price,
+  is_available,
+  CASE 
+    WHEN stock_quantity = 0 THEN 'out_of_stock'
+    WHEN stock_quantity <= 5 THEN 'critical'
+    WHEN stock_quantity <= 10 THEN 'low'
+    ELSE 'normal'
+  END as stock_status
+FROM products
+WHERE stock_quantity <= 10
+  AND is_available = true
+ORDER BY stock_quantity ASC;
+
+COMMENT ON VIEW products_low_stock IS 'Lista de productos con stock bajo (<= 10 unidades) que requieren atención';
+
+-- =====================================================
+-- VERIFICACIÓN
+-- =====================================================
+
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'reduce_product_stock') THEN
+    RAISE NOTICE '✓ Función reduce_product_stock creada correctamente';
+  END IF;
+  
+  IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'increment_product_stock') THEN
+    RAISE NOTICE '✓ Función increment_product_stock creada correctamente';
+  END IF;
+  
+  IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'check_product_stock') THEN
+    RAISE NOTICE '✓ Función check_product_stock creada correctamente';
+  END IF;
+  
+  IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'get_product_stock') THEN
+    RAISE NOTICE '✓ Función get_product_stock creada correctamente';
+  END IF;
+  
+  IF EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'products_low_stock') THEN
+    RAISE NOTICE '✓ Vista products_low_stock creada correctamente';
+  END IF;
+END $$;
